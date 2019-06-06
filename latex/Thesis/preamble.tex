@@ -1,0 +1,31 @@
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage[backend=biber,style=ieee,url=true,doi=true,dashed=false,sorting=nyt]{biblatex}
+\addbibresource{citations.bib}
+\usepackage{comment}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{enumerate}
+\usepackage{xcolor}
+\usepackage{mathtools}
+
+%% For Abs and Norm%%%%%%%%%%%%%%%%%%%%
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}
+
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+%
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\mathm}[1]{\(#1\)}
