@@ -1,8 +1,8 @@
 # Fdb version 3
-["pdflatex"] 1559816575 "/home/s2430789/Thesis/Git/latex/hello.py" "/home/s2430789/Thesis/Git/latex/hello.pdf" "hello" 1559816575
+["pdflatex"] 1559820304 "/home/s2430789/Thesis/Git/latex/hello.py" "/home/s2430789/Thesis/Git/latex/hello.pdf" "hello" 1559820304
   "/etc/texmf/web2c/texmf.cnf" 1540442896 838 1a7f35fa13839e48fb114eb1d6de2cf3 ""
-  "/home/s2430789/Thesis/Git/latex/hello.aux" 1559816575 8 a94a2480d3289e625eea47cd1b285758 ""
-  "/home/s2430789/Thesis/Git/latex/hello.py" 1559816569 91 2a6eea72e8c4f5e0ac0f1751010c2f24 ""
+  "/home/s2430789/Thesis/Git/latex/hello.aux" 1559820304 8 a94a2480d3289e625eea47cd1b285758 ""
+  "/home/s2430789/Thesis/Git/latex/hello.py" 1559820304 125 870a00eef9f864d3cf9ff09b363b96cb ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1248133631 35752 024fb6c41858982481f6968b5fc26508 ""
   "/usr/share/texlive/texmf-dist/tex/latex/base/article.cls" 1454284088 20708 39fdf9e2fb65617012fa7382a351f485 ""
   "/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo" 1454284088 9179 4cd3c5f593e63512893b8ac0123f1bd7 ""
@@ -10,11 +10,11 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1503343927 31343 93828589fb0cea665e553ee5a17ad2d4 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1531749060 1524806 1b7b0242d5dd363661400410aa16d056 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1540442950 1118998 fe7c19e72c8d664f6b275f215129720a ""
-  "hello.aux" 1559816575 8 a94a2480d3289e625eea47cd1b285758 ""
-  "hello.py" 1559816569 91 2a6eea72e8c4f5e0ac0f1751010c2f24 ""
+  "hello.aux" 1559820304 8 a94a2480d3289e625eea47cd1b285758 ""
+  "hello.py" 1559820304 125 870a00eef9f864d3cf9ff09b363b96cb ""
   (generated)
   "/home/s2430789/Thesis/Git/latex/hello.pdf"
-  "/home/s2430789/Thesis/Git/latex/hello.log"
   "hello.aux"
-  "hello.log"
   "hello.pdf"
+  "/home/s2430789/Thesis/Git/latex/hello.log"
+  "hello.log"
