@@ -8,68 +8,24 @@ INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\size10.clo
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\size10.clo
 INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\preamble.tex
 INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\preamble.tex
+INPUT C:\Program Files\MiKTeX 2.9\tex\generic\babel\babel.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\generic\babel\babel.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\generic\babel\switch.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\arabi\bblopts.cfg
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\arabi\bblopts.cfg
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\babel-english\english.ldf
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\babel-english\english.ldf
+INPUT C:\Program Files\MiKTeX 2.9\tex\generic\babel\babel.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\generic\babel\txtbabel.def
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\inputenc.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\inputenc.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\xcolor\xcolor.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\xcolor\xcolor.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics-cfg\color.cfg
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics-cfg\color.cfg
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics-def\pdftex.def
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics-def\pdftex.def
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\pdftexcmds.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\pdftexcmds.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\infwarerr.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\infwarerr.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ifluatex.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ifluatex.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ltxcmds.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ltxcmds.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ifpdf.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ifpdf.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\etoolbox\etoolbox.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\etoolbox\etoolbox.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics\keyval.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics\keyval.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\kvoptions.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\kvoptions.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\kvsetkeys.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\kvsetkeys.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\etexcmds.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\etexcmds.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\logreq\logreq.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\logreq\logreq.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\logreq\logreq.def
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\logreq\logreq.def
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\ifthen.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\ifthen.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\url\url.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\url\url.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\blx-dm.def
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\blx-dm.def
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\blx-compat.def
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\blx-compat.def
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.def
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.def
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex-ieee\ieee.bbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex-ieee\ieee.bbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\numeric-comp.bbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\numeric-comp.bbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\numeric.bbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\numeric.bbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\standard.bbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\standard.bbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\lbx\english.lbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\lbx\english.lbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex-ieee\ieee.cbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex-ieee\ieee.cbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\cbx\numeric-comp.cbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\cbx\numeric-comp.cbx
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.cfg
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.cfg
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\comment\comment.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\comment\comment.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\fontenc.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\fontenc.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\t1enc.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\t1enc.def
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\jknappen\ec\ecrm1000.tfm
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\amsfonts.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\amsfonts.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsmath\amsmath.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsmath\amsmath.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsmath\amstext.sty
@@ -82,10 +38,16 @@ INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsmath\amsopn.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsmath\amsopn.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\amssymb.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\amssymb.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\amsfonts.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\amsfonts.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amscls\amsthm.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amscls\amsthm.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\mathtools\mathtools.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\mathtools\mathtools.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics\keyval.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics\keyval.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\tools\calc.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\tools\calc.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\mathtools\mhsetup.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\mathtools\mhsetup.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics\graphicx.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics\graphicx.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics\graphics.sty
@@ -94,8 +56,16 @@ INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics\trig.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics\trig.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics-cfg\graphics.cfg
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics-cfg\graphics.cfg
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics-def\pdftex.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics-def\pdftex.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\xcolor\xcolor.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\xcolor\xcolor.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics-cfg\color.cfg
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\graphics-cfg\color.cfg
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\todonotes\todonotes.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\todonotes\todonotes.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\ifthen.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\base\ifthen.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\xkeyval\xkeyval.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\xkeyval\xkeyval.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\generic\xkeyval\xkeyval.tex
@@ -199,8 +169,6 @@ INPUT C:\Program Files\MiKTeX 2.9\tex\generic\pgf\frontendlayer\tikz\libraries\t
 INPUT C:\Program Files\MiKTeX 2.9\tex\generic\pgf\libraries\pgflibraryfadings.code.tex
 INPUT C:\Program Files\MiKTeX 2.9\tex\generic\pgf\libraries\pgflibraryfadings.code.tex
 OUTPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.pdf
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\tools\calc.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\tools\calc.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\hyperref.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\hyperref.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\hobsub-hyperref.sty
@@ -212,20 +180,74 @@ INPUT C:\Program Files\MiKTeX 2.9\tex\generic\ifxetex\ifxetex.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\generic\ifxetex\ifxetex.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\auxhook.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\auxhook.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\kvoptions.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\kvoptions.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\pd1enc.def
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\pd1enc.def
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\00miktex\hyperref.cfg
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\00miktex\hyperref.cfg
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\url\url.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\url\url.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\hpdftex.def
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\hpdftex.def
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\rerunfilecheck.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\rerunfilecheck.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\tools\enumerate.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\tools\enumerate.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\mathtools\mathtools.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\mathtools\mathtools.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\mathtools\mhsetup.sty
-INPUT C:\Program Files\MiKTeX 2.9\tex\latex\mathtools\mhsetup.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\etoolbox\etoolbox.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\etoolbox\etoolbox.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\logreq\logreq.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\logreq\logreq.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\logreq\logreq.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\logreq\logreq.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\blx-dm.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\blx-dm.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\blx-compat.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\blx-compat.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex-ieee\ieee.bbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex-ieee\ieee.bbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\numeric-comp.bbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\numeric-comp.bbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\numeric.bbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\numeric.bbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\standard.bbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\bbx\standard.bbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\lbx\english.lbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\lbx\english.lbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex-ieee\ieee.cbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex-ieee\ieee.cbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\cbx\numeric-comp.cbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\cbx\numeric-comp.cbx
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.cfg
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\biblatex.cfg
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\comment\comment.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\comment\comment.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\l3packages\xparse\xparse.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\l3packages\xparse\xparse.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\l3kernel\expl3.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\l3kernel\expl3.sty
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\l3kernel\expl3-code.tex
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\l3kernel\expl3-code.tex
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\tex\generic\unicode-data\UnicodeData.txt
+INPUT C:\Program Files\MiKTeX 2.9\tex\generic\unicode-data\UnicodeData.txt
+INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\nul:.tex
+INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\nul:.tex
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\l3kernel\l3pdfmode.def
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\l3kernel\l3pdfmode.def
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\lbx\english.lbx
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\biblatex\lbx\english.lbx
 INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.aux
@@ -237,10 +259,6 @@ INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\epstopdf-base.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\epstopdf-base.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\grfext.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\grfext.sty
-OUTPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.bcf
-INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.bbl
-INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.bbl
-INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.bbl
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\nameref.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\nameref.sty
 INPUT C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\gettitlestring.sty
@@ -252,11 +270,56 @@ INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\he
 INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.out
 INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.out
 OUTPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.out
+OUTPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.bcf
+INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.bbl
+INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.bbl
+INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.bbl
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\jknappen\ec\ecrm1728.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\jknappen\ec\ecrm0900.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\jknappen\ec\ecrm1200.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr12.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr8.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmr6.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmmi12.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmmi8.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmmi6.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmsy10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmsy8.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmsy6.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\cm\cmex10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\cmextra\cmex8.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\cmextra\cmex7.tfm
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msam10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msam10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msam7.tfm
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd
+INPUT C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msbm10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msbm10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msbm7.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\cmextra\cmex7.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\cmextra\cmex7.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msam10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msam7.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msam5.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msbm10.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msbm7.tfm
+INPUT C:\Program Files\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msbm5.tfm
 INPUT C:\Users\DMeadon\AppData\Local\MiKTeX\2.9\pdftex\config\pdftex.map
 INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.aux
 INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.out
 INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.out
 INPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.run.xml
 OUTPUT c:\Users\DMeadon\Documents\GitHub\BachelorProject_Backflow\latex\Thesis\hello.run.xml
-INPUT C:\Program Files\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr10.pfb
-INPUT C:\Program Files\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr10.pfb
+INPUT C:\Users\DMeadon\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1000.pk
+INPUT C:\Users\DMeadon\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1000.pk
+INPUT C:\Users\DMeadon\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1200.pk
+INPUT C:\Users\DMeadon\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1200.pk
+INPUT C:\Users\DMeadon\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm0900.pk
+INPUT C:\Users\DMeadon\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm0900.pk
+INPUT C:\Users\DMeadon\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1728.pk
+INPUT C:\Users\DMeadon\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1728.pk
+INPUT C:\Program Files\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr7.pfb
+INPUT C:\Program Files\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr7.pfb
