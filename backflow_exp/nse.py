@@ -21,8 +21,8 @@ def test(a, b):
 
 
 def betaupdate(current_sol, prev_sol, facet_norm, dx, beta):
-    if assemble(abs_n(dot(current_sol, facet_norm)) * dx) > assemble(abs_n(dot(prev_sol, facet_norm)) * dx):
-        return min(max(assemble(beta * dx) + 0.01, 0.2), 1)
+    if assemble(abs_n(dot(current_sol, facet_norm)) * div(current_sol) * dx) > assemble(abs_n(dot(prev_sol, facet_norm)) * div(prev_sol) * dx):
+        return min(max(assemble(beta * dx) + 0.1, 0.2), 1)
     else:
         return min(max(assemble(beta * dx) - 0.1, 0.2), 1)
 
@@ -237,7 +237,8 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         #             Ctgt = h ** 2
         #             F += Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
         #                 Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
-        # beta.assign(betaupdate(u0, r1, n, ds(2), beta))
+        beta.assign(betaupdate(u0, r1, n, ds(2), beta))
+        print(assemble(beta*ds(2)))
         #         beta = betaupdate(u0, r1, n, ds(2), beta) #This isn't updating the one in the function
         # #         print(assemble(beta*ds(2)))
 
@@ -262,11 +263,11 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # print(F)
     plt.figure()
     # plt.plot(viscEnergyVec, 'b', label="Viscous")
-    plt.plot(ToteviscEnergyVec, 'lightseagreen', label="tot Viscous")
+    # plt.plot(ToteviscEnergyVec, 'lightseagreen', label="tot Viscous")
     plt.plot(incEnergyVec, 'coral', label="Incoming")
     #     plt.plot(numEnergyVec, 'y', label="Numerical")
     #     plt.plot(stabEnergyVec, 'g', label='Stabilization')
-    #     plt.plot(stabEnergyVec + numEnergyVec, 'c', label='Total corrective energy')
+    plt.plot(ToteviscEnergyVec + stabEnergyVec + numEnergyVec, 'deepskyblue', label='Total corrective energy')
     plt.legend(loc='upper left')
     plt.show()
 
