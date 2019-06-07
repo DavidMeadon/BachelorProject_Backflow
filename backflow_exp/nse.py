@@ -237,8 +237,8 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         #             Ctgt = h ** 2
         #             F += Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
         #                 Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
-        beta.assign(betaupdate(u0, r1, n, ds(2), beta))
-        print(assemble(beta*ds(2)))
+        # beta.assign(betaupdate(u0, r1, n, ds(2), beta))
+        # print(assemble(beta*ds(2)))
         #         beta = betaupdate(u0, r1, n, ds(2), beta) #This isn't updating the one in the function
         # #         print(assemble(beta*ds(2)))
 
@@ -278,7 +278,7 @@ if __name__ == '__main__':
     Re = [2000]
 
     for Re_ in Re:
-        nse(Re_, level=1, temam=True, bfs=1, velocity_degree=1, eps=0.0001, dt=0.01)
+        nse(Re_, level=1, temam=True, bfs=2, velocity_degree=1, eps=0.0001, dt=0.01)
 
         ## Weird results for the stabilization if bfs = 2, and doenst work for bfs = 3
 
