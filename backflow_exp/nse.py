@@ -98,8 +98,6 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         Ctgt = h ** 2
         F -= Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
                 Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
-
-
     elif velocity_degree == 1 and float(eps):
         F += eps / mu * h ** 2 * inner(grad(p_), grad(q)) * dx
 
