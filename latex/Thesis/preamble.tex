@@ -27,6 +27,9 @@
 % \addbibresource{citations.bib}
 \usepackage{comment}
 
+%% For Title Page
+\usepackage{pdfpages}
+
 
 %%%%%%--FOR ABS AND NORM--%%%%%%
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}
@@ -109,3 +112,34 @@
 \ExplSyntaxOff
 %%      Can be used as \Int[0,T;0,a]{f^2}[t;x]    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{csvsimple}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{geometry}
+\usepackage{multicol}
+\usepackage{multirow} 
+\usepackage{fancyhdr}
+\usepackage{fancybox, calc}
+\usepackage{listings}
+\usepackage{enumerate}
+\usepackage{siunitx}
+\usepackage[titletoc]{appendix}
+\usepackage[T1]{fontenc}
+\usepackage{mathpazo}
+
+
+
+
+
+\newcommand{\mychapter}[2]{
+    \setcounter{chapter}{#1}
+    \setcounter{section}{0}
+    \chapter*{#2}
+    \addcontentsline{toc}{chapter}{#2}}
