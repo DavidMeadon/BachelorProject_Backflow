@@ -12,6 +12,9 @@
 *.cb2
 .*.lb
 
+## For VS code file
+*.json
+
 ## Intermediate documents:
 *.dvi
 *.xdv
