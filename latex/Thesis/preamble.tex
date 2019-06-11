@@ -7,7 +7,7 @@
 \usepackage{amsfonts}
 
 %% Sets page size and margins
-% \usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage[a4paper,top=1in,bottom=1in,left=1.5in,right=1in]{geometry}
 
 %% Math
 \usepackage{amsmath} %
@@ -23,8 +23,8 @@
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage{enumerate}
-% \usepackage[backend=biber,style=ieee,url=true,doi=true,dashed=false,sorting=nyt]{biblatex}
-% \addbibresource{citations.bib}
+\usepackage[backend=biber,style=ieee,url=true,doi=true,dashed=false,sorting=nyt]{biblatex}
+\addbibresource{citations.bib}
 \usepackage{comment}
 
 %% For Title Page
@@ -143,3 +143,5 @@
     \setcounter{section}{0}
     \chapter*{#2}
     \addcontentsline{toc}{chapter}{#2}}
+
+\usepackage{lipsum}

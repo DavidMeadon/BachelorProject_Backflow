@@ -1,11 +1,8 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper]{report}
 \input{preamble.tex}
 
 
-\title{Automated Backflow Stabilization\\
-{\small Literature Review Report}}
-\author{David Meadon}
-\date{\today}
+\includeonly{Sections/Introduction}
 
 \begin{document}
 \includepdf{Thesis_Frontpage.pdf}
@@ -17,18 +14,20 @@
 
 \tableofcontents
 
-\input{Sections/Introduction.tex}
+\include{Sections/Introduction}
 
-\section{Derivation of weak/variational form}
+\include{Sections/part2}
 
-\section{Discretized form}
+\include{Sections/part3}
 
-\section{Finding a stability criterion from discretized form}
+\include{Sections/part4}
 
-\section{test and compare}
+\include{Sections/part5}
 
-\section{Conclusion}
+\include{Sections/conclusion}
 
-\section{Future research}
+\include{Sections/ffinal}
+
+\printbibliography
 \end{document}
 
