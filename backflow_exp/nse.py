@@ -2,6 +2,11 @@ from dolfin import *
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse.linalg import eigs
+from matplotlib.animation import FuncAnimation
+from progressbar import ProgressBar
+import matplotlib.animation as animation
+
+
 
 
 def abs_n(x):
@@ -28,6 +33,25 @@ def betaupdate(current_sol, prev_sol, facet_norm, dx, beta):
         return min(max(assemble(beta * dx) - 0.1, 0.2), 1)
 
 
+def radfinder(M, k, n):
+    tote = 0
+    for p in range(n):
+        if p != k:
+            tote += np.abs(M[p])
+    return tote
+
+
+def gershgorinplotter(mat):
+    n = mat.shape[1]
+    fig = plt.figure()
+    for k in range(n):
+        center = mat[k, k]
+        rad = radfinder(mat[k, :], k, n)
+        circle1 = plt.Circle((center, 0), rad)
+        plt.gcf().gca().add_artist(circle1)
+    return fig
+
+
 class MyParameter:
     param = 1
 
@@ -42,6 +66,7 @@ class MyParameter:
 
 
 def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002, dt=0.001):
+    pbar = ProgressBar()
     mesh_root = 'stenosis_f0.6'
     if level == 2:
         mesh_root += '_fine'
@@ -74,9 +99,11 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     theta_p = theta
     p_ = theta_p * p + (1 - theta_p) * p0
 
+    laplace = mu * inner(grad(u_), grad(v)) * dx
+
     F = (
             k * rho * dot(u - u0, v) * dx
-            + mu * inner(grad(u_), grad(v)) * dx
+            + laplace
             - p_ * div(v) * dx + q * div(u) * dx
             + rho * dot(grad(u_) * u0, v) * dx
     )
@@ -158,8 +185,11 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     avgeig = np.zeros(((int)(T / dt), 1))
     #     print(type(F))
 
+    Writer = animation.writers['ffmpeg']
+    writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
+    anitemp = []
     # MAIN SOLVING LOOP
-    for t in np.arange(dt, T + dt, dt):
+    for t in pbar(np.arange(dt, T + dt, dt)):
         print('t = {}'.format(t))
 
         #### May not be necessary ####
@@ -226,14 +256,26 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
             Ctgt = h ** 2
             stabEnergyVec[(int)(t / dt) - 1] = assemble(Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
                     Dx(u0[0], 1) * Dx(u0[0], 1) + Dx(u0[1], 1) * Dx(u0[1], 1)) * ds(2))
-        MAT = assemble(lhs(G))
-        VEC = np.array(MAT.array())
+
+        ## Trying eigenvalue stuff - Quite slow and expensive
+        # MAT = assemble(lhs(G))
+        # VEC = np.array(MAT.array())
+        #
+        #
+        # eigvals = eigs(VEC, k=100, M=None, sigma=None, which='LM', v0=None, ncv=None, maxiter=None, tol=0,
+        #                return_eigenvectors=False, Minv=None, OPinv=None, OPpart=None)
+        #
+        # avgeig[(int)(t / dt) - 1] = np.mean(eigvals)
+
+        ##Gershgorin stuff:
+        lap = assemble(lhs(laplace))
+        lapmat = np.array(lap.array())
+        fig = plt.figure()
+
+        fig = gershgorinplotter(lapmat[-500:][:, -500:])
+        anitemp.append(fig)
 
 
-        eigvals = eigs(VEC, k=100, M=None, sigma=None, which='LM', v0=None, ncv=None, maxiter=None, tol=0,
-                       return_eigenvectors=False, Minv=None, OPinv=None, OPpart=None)
-
-        avgeig[(int)(t / dt) - 1] = np.mean(eigvals)
 
         ### Print out the values for the energy changes at the current time step
         # print('Viscous energy change:', viscEnergyVec[(int)(t/dt) - 1])
@@ -277,6 +319,14 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # Is it possible to solve along a specific boundary?
         # Can we get the matrices use behind the scenes in fenics?
         # print(F)
+
+    def animate(i):
+        (anitemp[i]).show()
+
+    ani = FuncAnimation(fig, animate, frames=17, repeat=True)
+
+    ani.save('HeroinOverdosesJumpy.mp4', writer=writer)
+
     plt.figure()
     plt.plot(avgeig)
     plt.title('Average Eigenvalues of ' + stabmethod)
