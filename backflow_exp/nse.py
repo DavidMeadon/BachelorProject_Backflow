@@ -1,6 +1,7 @@
 from dolfin import *
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.sparse.linalg import eigs
 
 
 def abs_n(x):
@@ -48,6 +49,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     mesh = Mesh(mesh_root + '.xml')
     boundaries = MeshFunction('size_t', mesh, mesh_root + '_facet_region.xml')
     ds = Measure('ds', domain=mesh, subdomain_data=boundaries)
+    stabmethod = ''
 
     VE = VectorElement('P', mesh.ufl_cell(), velocity_degree)
     PE = FiniteElement('P', mesh.ufl_cell(), 1)
@@ -91,13 +93,19 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
     ### Added here beta parameter to the stabilization terms which we can control
     if bfs == 1:
-        F -= 0.5 * rho * beta * dot(u0, n) * dot(u_, v) * ds(2)
+        stabmethod = 'velocity-penalization'
+        G = 0.5 * rho * beta * dot(u0, n) * dot(u_, v) * ds(2)
+        F -= G
     elif bfs == 2:
-        F -= 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
+        stabmethod = 'velocity-penalization negative part'
+        G = 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
+        F -= G
     elif bfs == 3:
+        stabmethod = 'velocity gradient penalization'
         Ctgt = h ** 2
-        F -= Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
+        G = Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
                 Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
+        F -= G
     elif velocity_degree == 1 and float(eps):
         F += eps / mu * h ** 2 * inner(grad(p_), grad(q)) * dx
 
@@ -147,7 +155,9 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     incEnergyVec2 = np.zeros(((int)(T / dt), 1))
     numEnergyVec = np.zeros(((int)(T / dt), 1))
     stabEnergyVec = np.zeros(((int)(T / dt), 1))
+    avgeig = np.zeros(((int)(T / dt), 1))
     #     print(type(F))
+
     # MAIN SOLVING LOOP
     for t in np.arange(dt, T + dt, dt):
         print('t = {}'.format(t))
@@ -216,6 +226,14 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
             Ctgt = h ** 2
             stabEnergyVec[(int)(t / dt) - 1] = assemble(Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
                     Dx(u0[0], 1) * Dx(u0[0], 1) + Dx(u0[1], 1) * Dx(u0[1], 1)) * ds(2))
+        MAT = assemble(lhs(G))
+        VEC = np.array(MAT.array())
+
+
+        eigvals = eigs(VEC, k=100, M=None, sigma=None, which='LM', v0=None, ncv=None, maxiter=None, tol=0,
+                       return_eigenvectors=False, Minv=None, OPinv=None, OPpart=None)
+
+        avgeig[(int)(t / dt) - 1] = np.mean(eigvals)
 
         ### Print out the values for the energy changes at the current time step
         # print('Viscous energy change:', viscEnergyVec[(int)(t/dt) - 1])
@@ -260,6 +278,10 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # Can we get the matrices use behind the scenes in fenics?
         # print(F)
     plt.figure()
+    plt.plot(avgeig)
+    plt.title('Average Eigenvalues of ' + stabmethod)
+    plt.show()
+    plt.figure()
     # plt.plot(viscEnergyVec, 'b', label="Viscous")
     # plt.plot(ToteviscEnergyVec, 'forestgreen', label="tot Viscous")
     plt.plot(incEnergyVec, 'red', label="Incoming")
@@ -267,6 +289,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     # plt.plot(stabEnergyVec, 'orange', label='Stabilization')
     plt.plot(ToteviscEnergyVec + numEnergyVec, 'deepskyblue', label='Total corrective energy')
     plt.legend(loc='upper left')
+    plt.title('Energy changes of ' + stabmethod)
     plt.show()
 
     # del xdmf_u, xdmf_p
@@ -276,7 +299,7 @@ if __name__ == '__main__':
     Re = [2000]
 
     for Re_ in Re:
-        nse(Re_, level=1, temam=True, bfs=2, velocity_degree=1, eps=0.0001, dt=0.01)
+        nse(Re_, level=1, temam=True, bfs=3, velocity_degree=1, eps=0.0001, dt=0.01)
 
         ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
 
