@@ -3,8 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse.linalg import eigs
 from matplotlib.animation import FuncAnimation
-from progressbar import ProgressBar
+# from progressbar import ProgressBar
 import matplotlib.animation as animation
+from numpy import linalg as LA
+from math import fabs
+import progress as prog
+
+# plt.rcParams['animation.ffmpeg_path'] = '/snap/bin/ffmpeg'
 
 
 
@@ -41,16 +46,72 @@ def radfinder(M, k, n):
     return tote
 
 
-def gershgorinplotter(mat):
+def gershgorinplotter(mat, t, bfsm):
     n = mat.shape[1]
+    # radii = np.zeros((n, 1))
+    # centers = np.zeros((n,1))
     fig = plt.figure()
-    for k in range(n):
-        center = mat[k, k]
-        rad = radfinder(mat[k, :], k, n)
-        circle1 = plt.Circle((center, 0), rad)
-        plt.gcf().gca().add_artist(circle1)
+    axes = plt.gca()
+    axes.set_xlim([-10, 10])
+    axes.set_ylim([-10, 10])
+    if n > 0:
+        for k in range(n):
+            # centers[k] = mat[k, k]
+            center = mat[k, k]
+            rad = radfinder(mat[k, :], k, n)
+            # radii[k] = radfinder(mat[k, :], k, n)
+            circle1 = plt.Circle((center, 0), rad)
+            plt.gcf().gca().add_artist(circle1)
+    plt.title('Method: ' + bfsm + ', Time: ' + str(t))
     return fig
 
+def isSquare(m):
+    cols = len(m)
+    for row in m:
+        if len(row) != cols:
+            return False
+    return True
+
+def GregsCircles(matrix):
+    if isSquare(matrix) != True:
+        print('Your input matrix is not square!')
+        return []
+    circles = []
+    for x in range(0,len(matrix)):
+        radius = 0
+        piv = matrix[x][x]
+        for y in range(0,len(matrix)):
+            if x != y:
+                radius += fabs(matrix[x][y])
+        circles.append([piv,radius])
+    return circles
+
+def plotCircles(circles, t, bfsm):
+    fig, ax = plt.subplots()
+    plt.title('Method: ' + bfsm + ', Time: ' + str(t))
+    plt.xlabel('Real Axis')
+    plt.ylabel('Imaginary Axis')
+    if circles == []:
+        return fig
+    index, radi = zip(*circles)
+    Xupper = max(index) + np.std(index)
+    Xlower = min(index) - np.std(index)
+    Ylimit = max(radi) + np.std(index)
+    ax = plt.gca()
+    ax.cla()
+    ax.set_xlim((Xlower,Xupper))
+    ax.set_ylim((-Ylimit,Ylimit))
+    plt.title('Method: ' + bfsm + ', Time: ' + str(t))
+    plt.xlabel('Real Axis')
+    plt.ylabel('Imaginary Axis')
+    for x in range(0,len(circles)):
+        circ = plt.Circle((index[x],0), radius = radi[x])
+        ax.add_artist(circ)
+    ax.plot([Xlower,Xupper],[0,0],'k--')
+    ax.plot([0,0],[-Ylimit,Ylimit],'k--')
+    return fig
+
+# plt.show()
 
 class MyParameter:
     param = 1
@@ -66,7 +127,7 @@ class MyParameter:
 
 
 def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002, dt=0.001):
-    pbar = ProgressBar()
+    # pbar = ProgressBar()
     mesh_root = 'stenosis_f0.6'
     if level == 2:
         mesh_root += '_fine'
@@ -74,7 +135,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     mesh = Mesh(mesh_root + '.xml')
     boundaries = MeshFunction('size_t', mesh, mesh_root + '_facet_region.xml')
     ds = Measure('ds', domain=mesh, subdomain_data=boundaries)
-    stabmethod = ''
+    stabmethod = 'No stabilization'
 
     VE = VectorElement('P', mesh.ufl_cell(), velocity_degree)
     PE = FiniteElement('P', mesh.ufl_cell(), 1)
@@ -108,6 +169,8 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
             + rho * dot(grad(u_) * u0, v) * dx
     )
 
+
+
     n = FacetNormal(mesh)
     h = CellDiameter(mesh)
 
@@ -117,6 +180,11 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         F += 0.5 * rho * div(u0) * dot(u_, v) * dx
 
     beta = Constant(1)  # TODO add an initial beta value, probably 1
+
+    backflow_func = 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
+
+    testfunc = mu * inner(grad(u_), grad(v)) * dx - 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
+
 
     ### Added here beta parameter to the stabilization terms which we can control
     if bfs == 1:
@@ -182,15 +250,17 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     incEnergyVec2 = np.zeros(((int)(T / dt), 1))
     numEnergyVec = np.zeros(((int)(T / dt), 1))
     stabEnergyVec = np.zeros(((int)(T / dt), 1))
-    avgeig = np.zeros(((int)(T / dt), 1))
+    # avgeig = np.zeros(((int)(T / dt), 1))
     #     print(type(F))
 
-    Writer = animation.writers['ffmpeg']
-    writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-    anitemp = []
+    # Writer = animation.writers['ffmpeg']
+    # writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
+    # anitemp = []
+    # print(testfunc)
+    pt = prog.progress_timer(description='Time Iterations', n_iter=40)
     # MAIN SOLVING LOOP
-    for t in pbar(np.arange(dt, T + dt, dt)):
-        print('t = {}'.format(t))
+    for t in np.arange(dt, T + dt, dt):
+        print('t = {}'.format(round(t, 2)))
 
         #### May not be necessary ####
         w0.assign(w)
@@ -267,13 +337,35 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         #
         # avgeig[(int)(t / dt) - 1] = np.mean(eigvals)
 
-        ##Gershgorin stuff:
-        lap = assemble(lhs(laplace))
-        lapmat = np.array(lap.array())
-        fig = plt.figure()
+        ## Finding backflow region of Matrix
+        lap = assemble(lhs(testfunc))
 
-        fig = gershgorinplotter(lapmat[-500:][:, -500:])
-        anitemp.append(fig)
+        lapmat = np.array(lap.array())
+        backflow_mat = assemble(lhs(backflow_func))
+        backflow_vec = np.array(backflow_mat.array())
+        reduced_laplace = lapmat*(backflow_vec != 0)
+        laplace_backflow = reduced_laplace[~(reduced_laplace == 0).all(1)]
+        laplace_backflow_final = np.transpose(laplace_backflow.transpose()[~(laplace_backflow.transpose() == 0).all(1)])
+
+        # anitemp.append(laplace_backflow_final)
+        # fig = gershgorinplotter(laplace_backflow_final, round(t, 2), stabmethod)
+        circles = GregsCircles(laplace_backflow_final)
+        fig = plotCircles(circles, round(t, 2), stabmethod)
+        eigenvals, eigenvecs = np.linalg.eig(laplace_backflow_final)
+        for eigval in eigenvals:
+            plt.plot(eigval.real, eigval.imag, 'r+')
+        fig.savefig('circles/' + str(round(t*100)) + 'gersh.png')
+        plt.close(fig)
+        del lap, lapmat, backflow_mat, backflow_vec, reduced_laplace, laplace_backflow, laplace_backflow_final, eigenvals, eigenvecs
+        # eigvals, eigvec = LA.eig(laplace_backflow_final)
+        # print(eigvals)
+
+        ##Gershgorin stuff:
+
+        # fig = plt.figure()
+        #
+        # fig = gershgorinplotter(lapmat[-500:][:, -500:])
+        # anitemp.append(fig)
 
 
 
@@ -319,28 +411,43 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # Is it possible to solve along a specific boundary?
         # Can we get the matrices use behind the scenes in fenics?
         # print(F)
+        pt.update()
+    pt.finish()
 
-    def animate(i):
-        (anitemp[i]).show()
 
-    ani = FuncAnimation(fig, animate, frames=17, repeat=True)
+    ## Animating the Gershgorin circles
+    # fig, ax = plt.subplots()
+    #
+    # def animate(i):
+    #     animat = anitemp[i]
+    #     centers, radii = gershgorinplotter(animat)
+    #     for idx in range(centers.size):
+    #         circle1 = plt.Circle(centers[idx], radii[idx])
+    #         fig.gca().add_artist(circle1)
+    #
+    # #
+    # # ani = FuncAnimation(fig, animate, frames=40, repeat=True)\
+    # ani = animation.FuncAnimation(fig, animate, np.arange(0, 40, 1))
+    # plt.show()
+    #
+    # ani.save("Gershgorin.mp4")
 
-    ani.save('HeroinOverdosesJumpy.mp4', writer=writer)
+    # plt.figure()
+    # plt.plot(avgeig)
+    # plt.title('Average Eigenvalues of ' + stabmethod)
+    # plt.show()
 
-    plt.figure()
-    plt.plot(avgeig)
-    plt.title('Average Eigenvalues of ' + stabmethod)
-    plt.show()
-    plt.figure()
-    # plt.plot(viscEnergyVec, 'b', label="Viscous")
-    # plt.plot(ToteviscEnergyVec, 'forestgreen', label="tot Viscous")
-    plt.plot(incEnergyVec, 'red', label="Incoming")
-    # plt.plot(numEnergyVec, 'yellow', label="Numerical")
-    # plt.plot(stabEnergyVec, 'orange', label='Stabilization')
-    plt.plot(ToteviscEnergyVec + numEnergyVec, 'deepskyblue', label='Total corrective energy')
-    plt.legend(loc='upper left')
-    plt.title('Energy changes of ' + stabmethod)
-    plt.show()
+
+    # plt.figure()
+    # # plt.plot(viscEnergyVec, 'b', label="Viscous")
+    # # plt.plot(ToteviscEnergyVec, 'forestgreen', label="tot Viscous")
+    # plt.plot(incEnergyVec, 'red', label="Incoming")
+    # # plt.plot(numEnergyVec, 'yellow', label="Numerical")
+    # # plt.plot(stabEnergyVec, 'orange', label='Stabilization')
+    # plt.plot(ToteviscEnergyVec + numEnergyVec, 'deepskyblue', label='Total corrective energy')
+    # plt.legend(loc='upper left')
+    # plt.title('Energy changes of ' + stabmethod)
+    # plt.show()
 
     # del xdmf_u, xdmf_p
 
@@ -349,7 +456,7 @@ if __name__ == '__main__':
     Re = [2000]
 
     for Re_ in Re:
-        nse(Re_, level=1, temam=True, bfs=3, velocity_degree=1, eps=0.0001, dt=0.01)
+        nse(Re_, level=1, temam=True, bfs=2, velocity_degree=1, eps=0.0001, dt=0.01)
 
         ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
 
