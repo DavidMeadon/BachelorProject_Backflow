@@ -1,10 +1,8 @@
 from dolfin import *
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.sparse.linalg import eigs
-from matplotlib.animation import FuncAnimation
-# from progressbar import ProgressBar
-import matplotlib.animation as animation
+import scipy as sp
+import scipy.sparse.linalg as ssl
 from numpy import linalg as LA
 from math import fabs
 import progress as prog
@@ -86,7 +84,7 @@ def GregsCircles(matrix):
         circles.append([piv,radius])
     return circles
 
-def plotCircles(circles, t, bfsm):
+def plotCircles(circles, t, bfsm, beta):
     fig, ax = plt.subplots()
     plt.title('Method: ' + bfsm + ', Time: ' + str(t))
     plt.xlabel('Real Axis')
@@ -94,14 +92,14 @@ def plotCircles(circles, t, bfsm):
     if circles == []:
         return fig
     index, radi = zip(*circles)
-    Xupper = max(index) + np.std(index)
-    Xlower = min(index) - np.std(index)
+    Xupper = 0.3#max(index) + np.std(index)
+    Xlower = -0.1#min(index) - np.std(index)
     Ylimit = max(radi) + np.std(index)
     ax = plt.gca()
     ax.cla()
     ax.set_xlim((Xlower,Xupper))
     ax.set_ylim((-Ylimit,Ylimit))
-    plt.title('Method: ' + bfsm + ', Time: ' + str(t))
+    plt.title('Method: ' + bfsm + ', Time: ' + str(t) + ', Beta: ' + str(beta))
     plt.xlabel('Real Axis')
     plt.ylabel('Imaginary Axis')
     for x in range(0,len(circles)):
@@ -179,13 +177,13 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     if temam:
         F += 0.5 * rho * div(u0) * dot(u_, v) * dx
 
-    beta = Constant(1)  # TODO add an initial beta value, probably 1
+    beta = Constant(1) #TODO add an initial beta value, probably 1
 
-    backflow_func = 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
-
-    testfunc = mu * inner(grad(u_), grad(v)) * dx - 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
+    backflow_func = 0.5 * rho * abs_n(dot(u0, n)) * dot(u_, v) * ds(2) #0.5 * rho * abs_n(div(u0)) * dot(u_, v) * dx
 
 
+
+    G = 0
     ### Added here beta parameter to the stabilization terms which we can control
     if bfs == 1:
         stabmethod = 'velocity-penalization'
@@ -203,6 +201,8 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         F -= G
     elif velocity_degree == 1 and float(eps):
         F += eps / mu * h ** 2 * inner(grad(p_), grad(q)) * dx
+
+    testfunc = laplace - backflow_func + G
 
     a = lhs(F)
     L = rhs(F)
@@ -260,7 +260,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     pt = prog.progress_timer(description='Time Iterations', n_iter=40)
     # MAIN SOLVING LOOP
     for t in np.arange(dt, T + dt, dt):
-        print('t = {}'.format(round(t, 2)))
+        # print('t = {}'.format(round(t, 2)))
 
         #### May not be necessary ####
         w0.assign(w)
@@ -276,6 +276,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         #### May not be necessary ####
 
         ###
+
 
         w1.assign(w)
         r1, s1 = w1.split()
@@ -338,9 +339,13 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # avgeig[(int)(t / dt) - 1] = np.mean(eigvals)
 
         ## Finding backflow region of Matrix
-        lap = assemble(lhs(testfunc))
-
+        lap = assemble(lhs(laplace))#testfunc))
+        lap2 = lap
+        for bc in bcs: bc.apply(lap)
+        print(LA.norm((np.array(lap.array()) - np.array(lap2.array()))))
         lapmat = np.array(lap.array())
+        lapmat2 = sp.sparse.bsr_matrix(lap.array())
+        # print("Finding Backflow region")
         backflow_mat = assemble(lhs(backflow_func))
         backflow_vec = np.array(backflow_mat.array())
         reduced_laplace = lapmat*(backflow_vec != 0)
@@ -349,16 +354,20 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
         # anitemp.append(laplace_backflow_final)
         # fig = gershgorinplotter(laplace_backflow_final, round(t, 2), stabmethod)
+        # print("Making Circles: " + str(len(laplace_backflow_final)))
         circles = GregsCircles(laplace_backflow_final)
-        fig = plotCircles(circles, round(t, 2), stabmethod)
-        eigenvals, eigenvecs = np.linalg.eig(laplace_backflow_final)
+        fig = plotCircles(circles, round(t, 2), stabmethod, assemble(beta*ds(2)))
+        # print("Finding Eigenvalues")
+        smalleig = ssl.eigs(lapmat2, 5, sigma=1e-6, which='LM', return_eigenvectors=False)
+        print(smalleig)
+        eigenvals = LA.eigvals(laplace_backflow_final)
         for eigval in eigenvals:
             plt.plot(eigval.real, eigval.imag, 'r+')
         fig.savefig('circles/' + str(round(t*100)) + 'gersh.png')
         plt.close(fig)
-        del lap, lapmat, backflow_mat, backflow_vec, reduced_laplace, laplace_backflow, laplace_backflow_final, eigenvals, eigenvecs
+        print(eigenvals)
+        del lap, lapmat, backflow_mat, backflow_vec, reduced_laplace, laplace_backflow, laplace_backflow_final, eigenvals
         # eigvals, eigvec = LA.eig(laplace_backflow_final)
-        # print(eigvals)
 
         ##Gershgorin stuff:
 
