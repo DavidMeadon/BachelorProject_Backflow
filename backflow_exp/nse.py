@@ -22,6 +22,15 @@ def backflowarea(a, b, c):
         return 1
     else:
         return 0
+def is_pos_def(A):
+    if np.array_equal(A, A.T):
+        try:
+            LA.cholesky(A)
+            return True
+        except LA.LinAlgError:
+            return False
+    else:
+        return False
 
 
 def test(a, b):
@@ -340,10 +349,15 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
         ## Finding backflow region of Matrix
         lap = assemble(lhs(laplace))#testfunc))
-        lap2 = lap
         for bc in bcs: bc.apply(lap)
-        print(LA.norm((np.array(lap.array()) - np.array(lap2.array()))))
         lapmat = np.array(lap.array())
+        # print('Diagonal:')
+        # print((np.diag(lapmat))[-10:-1])
+        # print('Sub-diagonal:')
+        # print((np.diag(lapmat, -1))[-10:-1])
+        # print('Sup-diagonal:')
+        # print((np.diag(lapmat, 1))[-10:-1])
+        print(is_pos_def(lapmat))
         lapmat2 = sp.sparse.bsr_matrix(lap.array())
         # print("Finding Backflow region")
         backflow_mat = assemble(lhs(backflow_func))
@@ -359,13 +373,15 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         fig = plotCircles(circles, round(t, 2), stabmethod, assemble(beta*ds(2)))
         # print("Finding Eigenvalues")
         smalleig = ssl.eigs(lapmat2, 5, sigma=1e-6, which='LM', return_eigenvectors=False)
-        print(smalleig)
+        # print(smalleig)
+        for EV in smalleig:
+            plt.plot(EV.real, EV.imag, 'go')
         eigenvals = LA.eigvals(laplace_backflow_final)
         for eigval in eigenvals:
             plt.plot(eigval.real, eigval.imag, 'r+')
         fig.savefig('circles/' + str(round(t*100)) + 'gersh.png')
         plt.close(fig)
-        print(eigenvals)
+        # print(eigenvals)
         del lap, lapmat, backflow_mat, backflow_vec, reduced_laplace, laplace_backflow, laplace_backflow_final, eigenvals
         # eigvals, eigvec = LA.eig(laplace_backflow_final)
 
@@ -465,7 +481,7 @@ if __name__ == '__main__':
     Re = [2000]
 
     for Re_ in Re:
-        nse(Re_, level=1, temam=True, bfs=2, velocity_degree=1, eps=0.0001, dt=0.01)
+        nse(Re_, level=1, temam=True, bfs=1, velocity_degree=1, eps=0.0001, dt=0.01)
 
         ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
 

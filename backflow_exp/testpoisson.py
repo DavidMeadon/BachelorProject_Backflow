@@ -2,11 +2,25 @@ from dolfin import *
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import linalg as LA
+import scipy as sp
+import scipy.sparse.linalg as ssl
     # Assignment: SUPG
+
+def is_pos_def(A):
+    if np.array_equal(A, A.T):
+        try:
+            np.linalg.cholesky(A)
+            return True
+        except np.linalg.LinAlgError:
+            return False
+    else:
+        return False
 
 def SolAdvDif(mu,N,nn,boundy):
 
-    mesh 		= 	UnitSquareMesh(N, N)
+    mesh_root = 'stenosis_f0.6'
+    mesh_root += '_fine'
+    mesh = Mesh(mesh_root + '.xml')
     tol 		= 	1E-14
     #h			=	mesh.hmin()
     h			=	1./N
@@ -26,16 +40,29 @@ def SolAdvDif(mu,N,nn,boundy):
 
 
     def boundary(x, on_boundary):
-        return on_boundary   
-    
+        return on_boundary
+
     
     bcs 			= 	DirichletBC(V, u_D, boundary)
 
 
     lap = assemble(a)
-    lap2 = assemble(a)
     bcs.apply(lap)
-    print(LA.norm((np.array(lap.array()) - np.array(lap2.array()))))
+    lapmat = np.array(lap.array())
+    print(is_pos_def(lapmat))
+    # lapmat = np.array(lap.array())
+    lapmat2 = sp.sparse.bsr_matrix(lap.array())
+    print(lapmat2.shape)
+    smalleig = ssl.eigs(lapmat2, 6, which='SM', return_eigenvectors=False)
+    print(smalleig)
+    fig = plt.figure()
+    axes = plt.gca()
+    axes.set_xlim([-0.0001, 0.0005])
+    axes.set_ylim([-1, 1])
+    for EV in smalleig:
+        plt.plot(EV.real, EV.imag, 'go')
+    plt.show()
+    # eigenvals = LA.eigvals(laplace_backflow_final)
 
 
 
