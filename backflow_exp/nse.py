@@ -23,7 +23,7 @@ def backflowarea(a, b, c):
     else:
         return 0
 def is_pos_def(A):
-    if np.array_equal(A, A.T):
+    if np.allclose(A, A.T):
         try:
             LA.cholesky(A)
             return True
@@ -101,8 +101,8 @@ def plotCircles(circles, t, bfsm, beta):
     if circles == []:
         return fig
     index, radi = zip(*circles)
-    Xupper = 0.3#max(index) + np.std(index)
-    Xlower = -0.1#min(index) - np.std(index)
+    Xupper = 10#max(index) + np.std(index)
+    Xlower = -10#min(index) - np.std(index)
     Ylimit = max(radi) + np.std(index)
     ax = plt.gca()
     ax.cla()
@@ -348,16 +348,9 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # avgeig[(int)(t / dt) - 1] = np.mean(eigvals)
 
         ## Finding backflow region of Matrix
-        lap = assemble(lhs(laplace))#testfunc))
+        lap = assemble(lhs(testfunc))#testfunc))
         for bc in bcs: bc.apply(lap)
         lapmat = np.array(lap.array())
-        # print('Diagonal:')
-        # print((np.diag(lapmat))[-10:-1])
-        # print('Sub-diagonal:')
-        # print((np.diag(lapmat, -1))[-10:-1])
-        # print('Sup-diagonal:')
-        # print((np.diag(lapmat, 1))[-10:-1])
-        print(is_pos_def(lapmat))
         lapmat2 = sp.sparse.bsr_matrix(lap.array())
         # print("Finding Backflow region")
         backflow_mat = assemble(lhs(backflow_func))
@@ -481,7 +474,7 @@ if __name__ == '__main__':
     Re = [2000]
 
     for Re_ in Re:
-        nse(Re_, level=1, temam=True, bfs=1, velocity_degree=1, eps=0.0001, dt=0.01)
+        nse(Re_, level=1, temam=True, bfs=3, velocity_degree=1, eps=0.0001, dt=0.01)
 
         ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
 

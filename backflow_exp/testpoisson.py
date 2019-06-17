@@ -7,20 +7,20 @@ import scipy.sparse.linalg as ssl
     # Assignment: SUPG
 
 def is_pos_def(A):
-    if np.array_equal(A, A.T):
+    if np.allclose(A, A.T): #Checks if symmetric
         try:
-            np.linalg.cholesky(A)
+            LA.cholesky(A)
             return True
-        except np.linalg.LinAlgError:
+        except LA.LinAlgError:
+            print('Cannot perform Cholesky factorization')
             return False
     else:
+        print('Not a Symmetric Matrix')
         return False
 
 def SolAdvDif(mu,N,nn,boundy):
 
-    mesh_root = 'stenosis_f0.6'
-    mesh_root += '_fine'
-    mesh = Mesh(mesh_root + '.xml')
+    mesh 		= 	UnitSquareMesh(N, N)
     tol 		= 	1E-14
     #h			=	mesh.hmin()
     h			=	1./N
@@ -49,11 +49,12 @@ def SolAdvDif(mu,N,nn,boundy):
     lap = assemble(a)
     bcs.apply(lap)
     lapmat = np.array(lap.array())
-    print(is_pos_def(lapmat))
+    print(is_pos_def(np.array([[-1, 2, 4], [2, -10, 1], [4, 1, 3]])))
     # lapmat = np.array(lap.array())
     lapmat2 = sp.sparse.bsr_matrix(lap.array())
     print(lapmat2.shape)
-    smalleig = ssl.eigs(lapmat2, 6, which='SM', return_eigenvectors=False)
+    smalleig = ssl.eigs(lapmat2, 1087, sigma=0, which='LM', return_eigenvectors=False)
+    print(sum(n <= 0 for n in smalleig))
     print(smalleig)
     fig = plt.figure()
     axes = plt.gca()
