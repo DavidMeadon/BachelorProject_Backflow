@@ -189,7 +189,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     beta = Constant(1) #TODO add an initial beta value, probably 1
 
     backflow_func = 0.5 * rho * abs_n(dot(u0, n)) * dot(u_, v) * ds(2) #0.5 * rho * abs_n(div(u0)) * dot(u_, v) * dx
-
+    gamma = Constant(1)
 
 
     G = 0
@@ -205,7 +205,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     elif bfs == 3:
         stabmethod = 'velocity gradient penalization'
         Ctgt = h ** 2
-        G = Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
+        G = gamma * Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
                 Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
         F -= G
     elif velocity_degree == 1 and float(eps):
@@ -253,12 +253,12 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     T = 0.4
     ite = 0
     # PLOTTING VECTORS
-    viscEnergyVec = np.zeros(((int)(T / dt), 1))
-    ToteviscEnergyVec = np.zeros(((int)(T / dt), 1))
-    incEnergyVec = np.zeros(((int)(T / dt), 1))
-    incEnergyVec2 = np.zeros(((int)(T / dt), 1))
-    numEnergyVec = np.zeros(((int)(T / dt), 1))
-    stabEnergyVec = np.zeros(((int)(T / dt), 1))
+    # viscEnergyVec = np.zeros(((int)(T / dt), 1))
+    # ToteviscEnergyVec = np.zeros(((int)(T / dt), 1))
+    # incEnergyVec = np.zeros(((int)(T / dt), 1))
+    # incEnergyVec2 = np.zeros(((int)(T / dt), 1))
+    # numEnergyVec = np.zeros(((int)(T / dt), 1))
+    # stabEnergyVec = np.zeros(((int)(T / dt), 1))
     # avgeig = np.zeros(((int)(T / dt), 1))
     #     print(type(F))
 
@@ -272,9 +272,9 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # print('t = {}'.format(round(t, 2)))
 
         #### May not be necessary ####
-        w0.assign(w)
-        r0, s0 = w0.split()
-        ####
+        # w0.assign(w)
+        # r0, s0 = w0.split()
+        # ####
 
         inflow.t = t
         assemble(a, tensor=A)
@@ -287,32 +287,32 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         ###
 
 
-        w1.assign(w)
-        r1, s1 = w1.split()
-
-        r1.vector().set_local(u0.vector().get_local() * (u0.vector().get_local() < 0))
-
-        # ite +=1
-        # if ite==5:
-        #    plt.plot(r1.vector().get_local())
-        #    plt.plot(u0.vector().get_local())
-
-        # print('|u|:', norm(u0))
-        # print('|p|:', norm(p0))
-        # print('div(u):', assemble(div(u0)*dx))
-
-        ### This was trying to view U0 as a numpy array but didnt show anything meaningful ####
-        # for i in u0.vector().get_local():
-        #     print(i)
-        # print(u0.vector().get_local())
-
-        # BACKFLOW KINETIC ENERGY CHANGE
-        BKE = assemble((rho / 2) * abs_n(dot(r0, n)) * dot(u0, u0) * ds(2))
+        # w1.assign(w)
+        # r1, s1 = w1.split()
+        #
+        # r1.vector().set_local(u0.vector().get_local() * (u0.vector().get_local() < 0))
+        #
+        # # ite +=1
+        # # if ite==5:
+        # #    plt.plot(r1.vector().get_local())
+        # #    plt.plot(u0.vector().get_local())
+        #
+        # # print('|u|:', norm(u0))
+        # # print('|p|:', norm(p0))
+        # # print('div(u):', assemble(div(u0)*dx))
+        #
+        # ### This was trying to view U0 as a numpy array but didnt show anything meaningful ####
+        # # for i in u0.vector().get_local():
+        # #     print(i)
+        # # print(u0.vector().get_local())
+        #
+        # # BACKFLOW KINETIC ENERGY CHANGE
+        # BKE = assemble((rho / 2) * abs_n(dot(r0, n)) * dot(u0, u0) * ds(2))
 
         # BACKFLOW VISCOUS ENERGY CHANGE
         # BVE = assemble(mu * inner(grad(r1),grad(r1)) * ds(2))
         # TVE = assemble(mu * inner(grad(u0),grad(u0))  * ds(2))
-        TVE = assemble(mu * inner(grad(u0), grad(u0)) * dx)
+        # TVE = assemble(mu * inner(grad(u0), grad(u0)) * dx)
 
         #         print( (abs_n(u0) != 0) )
         # BVEs = assemble(mu * np.abs(div(u0)) * div(r1) * ds(2))
@@ -321,21 +321,21 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
         # ADDING TO VECTORS
         # viscEnergyVec[(int)(t / dt) - 1] = BVE
-        ToteviscEnergyVec[(int)(t / dt) - 1] = TVE
-
-        incEnergyVec[(int)(t / dt) - 1] = BKE
-
-        numEnergyVec[(int)(t / dt) - 1] = assemble((dot(u0 - r0, u0 - r0)) * ds(2))
-
-        ### Here want to calculate how much energy chnages due to the stabilization
-        if bfs == 1:
-            stabEnergyVec[(int)(t / dt) - 1] = assemble(0.5 * beta * rho * abs_n(dot(u0, n)) * dot(u0, u0) * ds(2))
-        elif bfs == 2:
-            stabEnergyVec[(int)(t / dt) - 1] = assemble(0.5 * beta * rho * abs_n(dot(u0, n)) * dot(u0, u0) * ds(2))
-        elif bfs == 3:
-            Ctgt = h ** 2
-            stabEnergyVec[(int)(t / dt) - 1] = assemble(Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
-                    Dx(u0[0], 1) * Dx(u0[0], 1) + Dx(u0[1], 1) * Dx(u0[1], 1)) * ds(2))
+        # ToteviscEnergyVec[(int)(t / dt) - 1] = TVE
+        #
+        # incEnergyVec[(int)(t / dt) - 1] = BKE
+        #
+        # numEnergyVec[(int)(t / dt) - 1] = assemble((dot(u0 - r0, u0 - r0)) * ds(2))
+        #
+        # ### Here want to calculate how much energy chnages due to the stabilization
+        # if bfs == 1:
+        #     stabEnergyVec[(int)(t / dt) - 1] = assemble(0.5 * beta * rho * abs_n(dot(u0, n)) * dot(u0, u0) * ds(2))
+        # elif bfs == 2:
+        #     stabEnergyVec[(int)(t / dt) - 1] = assemble(0.5 * beta * rho * abs_n(dot(u0, n)) * dot(u0, u0) * ds(2))
+        # elif bfs == 3:
+        #     Ctgt = h ** 2
+        #     stabEnergyVec[(int)(t / dt) - 1] = assemble(Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
+        #             Dx(u0[0], 1) * Dx(u0[0], 1) + Dx(u0[1], 1) * Dx(u0[1], 1)) * ds(2))
 
         ## Trying eigenvalue stuff - Quite slow and expensive
         # MAT = assemble(lhs(G))
@@ -348,34 +348,58 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # avgeig[(int)(t / dt) - 1] = np.mean(eigvals)
 
         ## Finding backflow region of Matrix
-        lap = assemble(lhs(testfunc))#testfunc))
-        for bc in bcs: bc.apply(lap)
-        lapmat = np.array(lap.array())
-        lapmat2 = sp.sparse.bsr_matrix(lap.array())
-        # print("Finding Backflow region")
-        backflow_mat = assemble(lhs(backflow_func))
-        backflow_vec = np.array(backflow_mat.array())
-        reduced_laplace = lapmat*(backflow_vec != 0)
-        laplace_backflow = reduced_laplace[~(reduced_laplace == 0).all(1)]
-        laplace_backflow_final = np.transpose(laplace_backflow.transpose()[~(laplace_backflow.transpose() == 0).all(1)])
+        #testfunc))
+
 
         # anitemp.append(laplace_backflow_final)
         # fig = gershgorinplotter(laplace_backflow_final, round(t, 2), stabmethod)
         # print("Making Circles: " + str(len(laplace_backflow_final)))
-        circles = GregsCircles(laplace_backflow_final)
-        fig = plotCircles(circles, round(t, 2), stabmethod, assemble(beta*ds(2)))
-        # print("Finding Eigenvalues")
-        smalleig = ssl.eigs(lapmat2, 5, sigma=1e-6, which='LM', return_eigenvectors=False)
+        # circles = GregsCircles(laplace_backflow_final)
+        # fig = plotCircles(circles, round(t, 2), stabmethod, assemble(beta*ds(2)))
+        # # print("Finding Eigenvalues")
+        # smalleig = ssl.eigs(lapmat2, 5, sigma=1e-6, which='LM', return_eigenvectors=False)
         # print(smalleig)
-        for EV in smalleig:
-            plt.plot(EV.real, EV.imag, 'go')
-        eigenvals = LA.eigvals(laplace_backflow_final)
-        for eigval in eigenvals:
-            plt.plot(eigval.real, eigval.imag, 'r+')
-        fig.savefig('circles/' + str(round(t*100)) + 'gersh.png')
-        plt.close(fig)
+        # for EV in smalleig:
+        #     plt.plot(EV.real, EV.imag, 'go')
+        # fig = plt.figure()
+        # ax = plt.gca()
+        # ax.set_xlim((-5, 15))
+        # plt.title('Method: ' + stabmethod + ', Time: ' + str(round(t, 2)) + ', Gamma: ' + str(assemble(gamma*ds(2))))
+        # plt.xlabel('Real Axis')
+        # plt.ylabel('Imaginary Axis')
+
+        gamma.assign(1)
+        while(True):
+            lap = assemble(lhs(testfunc))
+            for bc in bcs: bc.apply(lap)
+            lapmat = np.array(lap.array())
+            # lapmat2 = sp.sparse.bsr_matrix(lap.array())
+            # # print("Finding Backflow region")
+            backflow_mat = assemble(lhs(backflow_func))
+            backflow_vec = np.array(backflow_mat.array())
+            reduced_laplace = lapmat * (backflow_vec != 0)
+            laplace_backflow = reduced_laplace[~(reduced_laplace == 0).all(1)]
+            laplace_backflow_final = np.transpose(
+                laplace_backflow.transpose()[~(laplace_backflow.transpose() == 0).all(1)])
+            eigenvals = LA.eigvals(laplace_backflow_final)
+            if eigenvals.size == 0:
+                break
+            elif (eigenvals.min()) > 0:
+                print(eigenvals.min())
+                break
+            else:
+                if eigenvals.size > 0:
+                    print(eigenvals.min())
+                gamma.assign(assemble(gamma*ds(2))*2)
+                del lap, lapmat, backflow_mat, backflow_vec, reduced_laplace, laplace_backflow, laplace_backflow_final, eigenvals
+
+
+        # for eigval in eigenvals:
+        #     plt.plot(eigval.real, eigval.imag, 'r+')
+        # fig.savefig('circles/' + str(round(t*100)) + 'gersh.png')
+        # plt.close(fig)
         # print(eigenvals)
-        del lap, lapmat, backflow_mat, backflow_vec, reduced_laplace, laplace_backflow, laplace_backflow_final, eigenvals
+
         # eigvals, eigvec = LA.eig(laplace_backflow_final)
 
         ##Gershgorin stuff:
