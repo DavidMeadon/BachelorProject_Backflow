@@ -6,132 +6,7 @@ import scipy.sparse.linalg as ssl
 from numpy import linalg as LA
 from math import fabs
 import progress as prog
-
-# plt.rcParams['animation.ffmpeg_path'] = '/snap/bin/ffmpeg'
-
-
-
-
-def abs_n(x):
-    return -0.5 * (x - abs(x))
-
-
-# TODO rework the backflowarea function since it doesn't do as it should.
-def backflowarea(a, b, c):
-    if assemble(abs_n(dot(a, b)) * c) > 0:
-        return 1
-    else:
-        return 0
-def is_pos_def(A):
-    if np.allclose(A, A.T):
-        try:
-            LA.cholesky(A)
-            return True
-        except LA.LinAlgError:
-            return False
-    else:
-        return False
-
-
-def test(a, b):
-    print(dot(a, b))
-    return 1
-
-
-def betaupdate(current_sol, prev_sol, facet_norm, dx, beta):
-    if assemble(abs_n(dot(current_sol, facet_norm)) * div(current_sol) * dx) > assemble(abs_n(dot(prev_sol, facet_norm)) * div(prev_sol) * dx):
-        return min(max(assemble(beta * dx) + 0.1, 0.2), 1)
-    else:
-        return min(max(assemble(beta * dx) - 0.1, 0.2), 1)
-
-
-def radfinder(M, k, n):
-    tote = 0
-    for p in range(n):
-        if p != k:
-            tote += np.abs(M[p])
-    return tote
-
-
-def gershgorinplotter(mat, t, bfsm):
-    n = mat.shape[1]
-    # radii = np.zeros((n, 1))
-    # centers = np.zeros((n,1))
-    fig = plt.figure()
-    axes = plt.gca()
-    axes.set_xlim([-10, 10])
-    axes.set_ylim([-10, 10])
-    if n > 0:
-        for k in range(n):
-            # centers[k] = mat[k, k]
-            center = mat[k, k]
-            rad = radfinder(mat[k, :], k, n)
-            # radii[k] = radfinder(mat[k, :], k, n)
-            circle1 = plt.Circle((center, 0), rad)
-            plt.gcf().gca().add_artist(circle1)
-    plt.title('Method: ' + bfsm + ', Time: ' + str(t))
-    return fig
-
-def isSquare(m):
-    cols = len(m)
-    for row in m:
-        if len(row) != cols:
-            return False
-    return True
-
-def GregsCircles(matrix):
-    if isSquare(matrix) != True:
-        print('Your input matrix is not square!')
-        return []
-    circles = []
-    for x in range(0,len(matrix)):
-        radius = 0
-        piv = matrix[x][x]
-        for y in range(0,len(matrix)):
-            if x != y:
-                radius += fabs(matrix[x][y])
-        circles.append([piv,radius])
-    return circles
-
-def plotCircles(circles, t, bfsm, beta):
-    fig, ax = plt.subplots()
-    plt.title('Method: ' + bfsm + ', Time: ' + str(t))
-    plt.xlabel('Real Axis')
-    plt.ylabel('Imaginary Axis')
-    if circles == []:
-        return fig
-    index, radi = zip(*circles)
-    Xupper = 10#max(index) + np.std(index)
-    Xlower = -10#min(index) - np.std(index)
-    Ylimit = max(radi) + np.std(index)
-    ax = plt.gca()
-    ax.cla()
-    ax.set_xlim((Xlower,Xupper))
-    ax.set_ylim((-Ylimit,Ylimit))
-    plt.title('Method: ' + bfsm + ', Time: ' + str(t) + ', Beta: ' + str(beta))
-    plt.xlabel('Real Axis')
-    plt.ylabel('Imaginary Axis')
-    for x in range(0,len(circles)):
-        circ = plt.Circle((index[x],0), radius = radi[x])
-        ax.add_artist(circ)
-    ax.plot([Xlower,Xupper],[0,0],'k--')
-    ax.plot([0,0],[-Ylimit,Ylimit],'k--')
-    return fig
-
-# plt.show()
-
-class MyParameter:
-    param = 1
-
-    def __init__(self, value):
-        self.param = value
-
-    def update(self, value):
-        self.param = value
-
-    def value(self):
-        return self.param
-
+import HelperFuncs as HF
 
 def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002, dt=0.001):
     # pbar = ProgressBar()
@@ -188,7 +63,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
     beta = Constant(1) #TODO add an initial beta value, probably 1
 
-    backflow_func = 0.5 * rho * abs_n(dot(u0, n)) * dot(u_, v) * ds(2) #0.5 * rho * abs_n(div(u0)) * dot(u_, v) * dx
+    backflow_func = 0.5 * rho * HF.abs_n(dot(u0, n)) * dot(u_, v) * ds(2) #0.5 * rho * HF.abs_n(div(u0)) * dot(u_, v) * dx
     gamma = Constant(1)
 
 
@@ -200,12 +75,12 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         F -= G
     elif bfs == 2:
         stabmethod = 'velocity-penalization negative part'
-        G = 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
+        G = 0.5 * rho * beta * HF.abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
         F -= G
     elif bfs == 3:
         stabmethod = 'velocity gradient penalization'
         Ctgt = h ** 2
-        G = gamma * Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
+        G = gamma * Ctgt * 0.5 * rho * HF.abs_n(dot(u0, n)) * (
                 Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
         F -= G
     elif velocity_degree == 1 and float(eps):
@@ -251,7 +126,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
     # FINAL TIME
     T = 0.4
-    ite = 0
+
     # PLOTTING VECTORS
     # viscEnergyVec = np.zeros(((int)(T / dt), 1))
     # ToteviscEnergyVec = np.zeros(((int)(T / dt), 1))
@@ -262,10 +137,6 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     # avgeig = np.zeros(((int)(T / dt), 1))
     #     print(type(F))
 
-    # Writer = animation.writers['ffmpeg']
-    # writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-    # anitemp = []
-    # print(testfunc)
     pt = prog.progress_timer(description='Time Iterations', n_iter=40)
     # MAIN SOLVING LOOP
     for t in np.arange(dt, T + dt, dt):
@@ -307,14 +178,14 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # # print(u0.vector().get_local())
         #
         # # BACKFLOW KINETIC ENERGY CHANGE
-        # BKE = assemble((rho / 2) * abs_n(dot(r0, n)) * dot(u0, u0) * ds(2))
+        # BKE = assemble((rho / 2) * HF.abs_n(dot(r0, n)) * dot(u0, u0) * ds(2))
 
         # BACKFLOW VISCOUS ENERGY CHANGE
         # BVE = assemble(mu * inner(grad(r1),grad(r1)) * ds(2))
         # TVE = assemble(mu * inner(grad(u0),grad(u0))  * ds(2))
         # TVE = assemble(mu * inner(grad(u0), grad(u0)) * dx)
 
-        #         print( (abs_n(u0) != 0) )
+        #         print( (HF.abs_n(u0) != 0) )
         # BVEs = assemble(mu * np.abs(div(u0)) * div(r1) * ds(2))
 
         # TODO rework the backflowarea function so that it is one when there is backflow and 0 otherwise
@@ -329,12 +200,12 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         #
         # ### Here want to calculate how much energy chnages due to the stabilization
         # if bfs == 1:
-        #     stabEnergyVec[(int)(t / dt) - 1] = assemble(0.5 * beta * rho * abs_n(dot(u0, n)) * dot(u0, u0) * ds(2))
+        #     stabEnergyVec[(int)(t / dt) - 1] = assemble(0.5 * beta * rho * HF.abs_n(dot(u0, n)) * dot(u0, u0) * ds(2))
         # elif bfs == 2:
-        #     stabEnergyVec[(int)(t / dt) - 1] = assemble(0.5 * beta * rho * abs_n(dot(u0, n)) * dot(u0, u0) * ds(2))
+        #     stabEnergyVec[(int)(t / dt) - 1] = assemble(0.5 * beta * rho * HF.abs_n(dot(u0, n)) * dot(u0, u0) * ds(2))
         # elif bfs == 3:
         #     Ctgt = h ** 2
-        #     stabEnergyVec[(int)(t / dt) - 1] = assemble(Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
+        #     stabEnergyVec[(int)(t / dt) - 1] = assemble(Ctgt * 0.5 * rho * HF.abs_n(dot(u0, n)) * (
         #             Dx(u0[0], 1) * Dx(u0[0], 1) + Dx(u0[1], 1) * Dx(u0[1], 1)) * ds(2))
 
         ## Trying eigenvalue stuff - Quite slow and expensive
@@ -347,20 +218,26 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         #
         # avgeig[(int)(t / dt) - 1] = np.mean(eigvals)
 
-        ## Finding backflow region of Matrix
-        #testfunc))
+
+        ### Building matrix and applying eigenvalues
+        lap = assemble(lhs(testfunc))
+        for bc in bcs: bc.apply(lap)
+        lapmat = np.array(lap.array())
+        lapmat2 = sp.sparse.bsr_matrix(lap.array()) # Sparse Version
+
+        ### Creating reduced backflow matrix
+        laplace_backflow_final = HF.reduced_back_mat(backflow_func, lapmat)
 
 
-        # anitemp.append(laplace_backflow_final)
-        # fig = gershgorinplotter(laplace_backflow_final, round(t, 2), stabmethod)
-        # print("Making Circles: " + str(len(laplace_backflow_final)))
-        # circles = GregsCircles(laplace_backflow_final)
-        # fig = plotCircles(circles, round(t, 2), stabmethod, assemble(beta*ds(2)))
-        # # print("Finding Eigenvalues")
-        # smalleig = ssl.eigs(lapmat2, 5, sigma=1e-6, which='LM', return_eigenvectors=False)
-        # print(smalleig)
-        # for EV in smalleig:
-        #     plt.plot(EV.real, EV.imag, 'go')
+        ### Creating Gershgorin Circles of Reduced Matrix
+        circles = HF.GregsCircles(laplace_backflow_final)
+        fig = HF.plotCircles(circles, round(t, 2), stabmethod, assemble(beta*ds(2)))
+        smalleig = ssl.eigs(lapmat2, 5, sigma=1e-6, which='LM', return_eigenvectors=False)
+        eigenvals = LA.eigvals(laplace_backflow_final)
+        for EV in smalleig:
+            plt.plot(EV.real, EV.imag, 'go')
+        for eigval in eigenvals:
+            plt.plot(eigval.real, eigval.imag, 'r+')
         # fig = plt.figure()
         # ax = plt.gca()
         # ax.set_xlim((-5, 15))
@@ -368,48 +245,17 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # plt.xlabel('Real Axis')
         # plt.ylabel('Imaginary Axis')
 
-        gamma.assign(1)
-        while(True):
-            lap = assemble(lhs(testfunc))
-            for bc in bcs: bc.apply(lap)
-            lapmat = np.array(lap.array())
-            # lapmat2 = sp.sparse.bsr_matrix(lap.array())
-            # # print("Finding Backflow region")
-            backflow_mat = assemble(lhs(backflow_func))
-            backflow_vec = np.array(backflow_mat.array())
-            reduced_laplace = lapmat * (backflow_vec != 0)
-            laplace_backflow = reduced_laplace[~(reduced_laplace == 0).all(1)]
-            laplace_backflow_final = np.transpose(
-                laplace_backflow.transpose()[~(laplace_backflow.transpose() == 0).all(1)])
-            eigenvals = LA.eigvals(laplace_backflow_final)
-            if eigenvals.size == 0:
-                break
-            elif (eigenvals.min()) > 0:
-                print(eigenvals.min())
-                break
-            else:
-                if eigenvals.size > 0:
-                    print(eigenvals.min())
-                gamma.assign(assemble(gamma*ds(2))*2)
-                del lap, lapmat, backflow_mat, backflow_vec, reduced_laplace, laplace_backflow, laplace_backflow_final, eigenvals
-
-
-        # for eigval in eigenvals:
-        #     plt.plot(eigval.real, eigval.imag, 'r+')
-        # fig.savefig('circles/' + str(round(t*100)) + 'gersh.png')
-        # plt.close(fig)
-        # print(eigenvals)
-
-        # eigvals, eigvec = LA.eig(laplace_backflow_final)
-
-        ##Gershgorin stuff:
-
-        # fig = plt.figure()
+        # print("Testfunc matrix is: " + HF.diag_dom(lapmat))
         #
-        # fig = gershgorinplotter(lapmat[-500:][:, -500:])
-        # anitemp.append(fig)
+        #
+        # print("Reduced Matrix is: " + HF.diag_dom(laplace_backflow_final))
 
+        if eigenvals.size > 0:
+            print(eigenvals.min())
+        fig.savefig('circles/' + str(round(t*100)) + 'gersh.png')
+        plt.close(fig)
 
+        del lap, lapmat, laplace_backflow_final, eigenvals
 
         ### Print out the values for the energy changes at the current time step
         # print('Viscous energy change:', viscEnergyVec[(int)(t/dt) - 1])
@@ -418,66 +264,8 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
         # xdmf_u.write(u0, t)
         # xdmf_p.write(p0, t)
-        # xdmf_p.write(p0, t)
-
-        # print(F)
-        #         if bfs == 1:
-        #           F += 0.5 * rho * beta * dot(u0, n) * dot(u_, v) * ds(2)
-        #         elif bfs == 2:
-        #           F += 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
-        #         elif bfs == 3:
-        #             Ctgt = h ** 2
-        #             F += Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
-        #                 Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
-        # beta.assign(betaupdate(u0, r1, n, ds(2), beta))
-        # print(assemble(beta*ds(2)))
-        #         beta = betaupdate(u0, r1, n, ds(2), beta) #This isn't updating the one in the function
-        # #         print(assemble(beta*ds(2)))
-
-        #         if bfs == 1:
-        #           F -= 0.5 * rho * beta * dot(u0, n) * dot(u_, v) * ds(2)
-        #         elif bfs == 2:
-        #           F -= 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
-        #         elif bfs == 3:
-        #             Ctgt = h ** 2
-        #             F -= Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
-        #                 Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
-
-        #         a = lhs(F)
-        #         L = rhs(F)
-
-        #         A = assemble(a)
-
-        # print(F)
-        # beta = beta/2;    # TODO change the beta parameter to update every iteration of the loop
-        # Is it possible to solve along a specific boundary?
-        # Can we get the matrices use behind the scenes in fenics?
-        # print(F)
         pt.update()
     pt.finish()
-
-
-    ## Animating the Gershgorin circles
-    # fig, ax = plt.subplots()
-    #
-    # def animate(i):
-    #     animat = anitemp[i]
-    #     centers, radii = gershgorinplotter(animat)
-    #     for idx in range(centers.size):
-    #         circle1 = plt.Circle(centers[idx], radii[idx])
-    #         fig.gca().add_artist(circle1)
-    #
-    # #
-    # # ani = FuncAnimation(fig, animate, frames=40, repeat=True)\
-    # ani = animation.FuncAnimation(fig, animate, np.arange(0, 40, 1))
-    # plt.show()
-    #
-    # ani.save("Gershgorin.mp4")
-
-    # plt.figure()
-    # plt.plot(avgeig)
-    # plt.title('Average Eigenvalues of ' + stabmethod)
-    # plt.show()
 
 
     # plt.figure()
