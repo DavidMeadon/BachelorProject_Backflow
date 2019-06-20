@@ -73,8 +73,8 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     if temam:
         F += 0.5 * rho * div(u0) * dot(u_, v) * dx
 
-    beta = Constant(0.5)                  #TODO add initial values, probably 1
-    gamma = Constant(3)
+    beta = Constant(1)               #TODO add initial values, probably 1
+    gamma = Constant(1)
 
     backflow_func = 0.5 * rho * HF.abs_n(dot(u0, n)) * dot(u_, v) * ds(2) #0.5 * rho * HF.abs_n(div(u0)) * dot(u_, v) * dx
 
@@ -172,33 +172,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     pt = prog.progress_timer(description='Time Iterations', n_iter=40)
     # MAIN SOLVING LOOP
     for t in np.arange(dt, T + dt, dt):
-        backflow_mat = assemble(lhs(backflow_func))
-        backflow_vec = np.array(backflow_mat.array())
 
-        gamma.assign(1)
-        while True:
-            ### Building matrix and applying eigenvalues
-            lap = assemble(lhs(testfunc))
-            for bc in bcs: bc.apply(lap)
-            lapmat = np.array(lap.array())
-            lapmat += np.eye(lapmat.shape[0])
-            reduced_laplace = lapmat * (backflow_vec != 0)
-            laplace_backflow = reduced_laplace[~(reduced_laplace == 0).all(1)]
-
-            # lapmat2 = sp.sparse.bsr_matrix(lapmat) # Sparse Version
-
-            ### Creating reduced backflow matrix
-            laplace_backflow_final = np.transpose(
-                laplace_backflow.transpose()[~(laplace_backflow.transpose() == 0).all(1)])
-            eigenvals = LA.eigvals(laplace_backflow_final)
-            if eigenvals.size == 0:
-                break
-            if eigenvals.min() >= 0:
-                break
-            else:
-                gamma.assign(assemble(gamma * ds(2))*2)
-
-        print(round(assemble(gamma * ds(2))))
         # print('t = {}'.format(round(t, 2)))
 
         #### May not be necessary ####
@@ -256,8 +230,48 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         #
         # numEnergyVec[(int)(t / dt) - 1] = assemble((dot(u0 - r0, u0 - r0)) * ds(2))
         # print(numEnergyVec[(int)(t / dt) - 1])
-        numericalEn = assemble(0.5 * rho * dot(u0 - r0, u0 - r0) * dx)
-        print(numericalEn)
+        # if bfs == 3:
+        #     numericalfunc = 0.5 * rho * dot(u0 - r0, u0 - r0) * dx
+        #     # numericalEn = assemble(numericalfunc)
+        #     # print(numericalEn)
+        #
+        #     backflow_mat = assemble(lhs(backflow_func))
+        #     backflow_vec = np.array(backflow_mat.array())
+        #
+        #     gamma.assign(1)
+            # while True:
+            #     ### Building matrix and applying eigenvalues
+            #     lap = assemble(lhs(testfunc + numericalfunc))
+            #     for bc in bcs: bc.apply(lap)
+            #     lapmat = np.array(lap.array())
+            #     # lapmat += np.eye(lapmat.shape[0])
+            #     reduced_laplace = lapmat * (backflow_vec != 0)
+            #     laplace_backflow = reduced_laplace[~(reduced_laplace == 0).all(1)]
+            #
+            #     # lapmat2 = sp.sparse.bsr_matrix(lapmat) # Sparse Version
+            #
+            #     ### Creating reduced backflow matrix
+            #     laplace_backflow_final = np.transpose(
+            #         laplace_backflow.transpose()[~(laplace_backflow.transpose() == 0).all(1)])
+            #     eigenvals = LA.eigvals(laplace_backflow_final)
+            #     if eigenvals.size == 0:
+            #         del lap, lapmat, laplace_backflow_final, eigenvals
+            #         break
+            #     if eigenvals.min() >= 0:
+            #         del lap, lapmat, laplace_backflow_final, eigenvals
+            #         break
+            #     else:
+            #         del lap, lapmat, laplace_backflow_final, eigenvals
+            #         gamma.assign(assemble(gamma * ds(2)) * 2)
+            #
+            # print(round(assemble(gamma * ds(2))))
+
+            #
+            # inflow.t = t
+            # assemble(a, tensor=A)
+            # b = assemble(L)
+            # [bc.apply(A, b) for bc in bcs]
+            # solve(A, w.vector(), b)
         #
         # ### Here want to calculate how much energy chnages due to the stabilization
         # if bfs == 1:
@@ -316,7 +330,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # fig.savefig('circles/' + str(round(t*100)) + 'gersh.png')
         # plt.close(fig)
 
-        del lap, lapmat, laplace_backflow_final, eigenvals
+
 
         ### Print out the values for the energy changes at the current time step
         # print('Viscous energy change:', viscEnergyVec[(int)(t/dt) - 1])
