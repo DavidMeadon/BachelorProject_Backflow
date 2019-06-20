@@ -7,7 +7,7 @@ from numpy import linalg as LA
 from math import fabs
 
 def abs_n(x):
-    return -0.5 * (x - abs(x))
+    return 0.5 * (x - abs(x))
 
 
 # # TODO rework the backflowarea function since it doesn't do as it should.
@@ -106,7 +106,7 @@ def GregsCircles(matrix):
         circles.append([piv,radius])
     return circles
 
-def plotCircles(circles, t, bfsm, beta):
+def plotCircles(circles, t, bfsm, param, paramval):
     fig, ax = plt.subplots()
     plt.title('Method: ' + bfsm + ', Time: ' + str(t))
     plt.xlabel('Real Axis')
@@ -121,7 +121,7 @@ def plotCircles(circles, t, bfsm, beta):
     ax.cla()
     ax.set_xlim((Xlower,Xupper))
     ax.set_ylim((-Ylimit,Ylimit))
-    plt.title('Method: ' + bfsm + ', Time: ' + str(t) + ', Beta: ' + str(beta))
+    plt.title('Method: ' + bfsm + ', Time: ' + str(t) + ', ' + param + ' = ' + str(paramval))
     plt.xlabel('Real Axis')
     plt.ylabel('Imaginary Axis')
     for x in range(0,len(circles)):
