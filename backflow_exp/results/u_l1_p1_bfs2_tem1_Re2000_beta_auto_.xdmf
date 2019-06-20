@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="3.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Domain>
+    <Grid Name="TimeSeries_u" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Topology NumberOfElements="4596" TopologyType="Triangle" NodesPerElement="3">
+          <DataItem Dimensions="4596 3" NumberType="UInt" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/0/mesh/topology</DataItem>
+        </Topology>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="2423 2" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/0/mesh/geometry</DataItem>
+        </Geometry>
+        <Time Value="0.01" />
+        <Attribute Name="u" AttributeType="Vector" Center="Node">
+          <DataItem Dimensions="2423 3" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/VisualisationVector/0</DataItem>
+        </Attribute>
+      </Grid>
+      <Grid Name="mesh" GridType="Uniform">
+        <Topology NumberOfElements="4596" TopologyType="Triangle" NodesPerElement="3">
+          <DataItem Dimensions="4596 3" NumberType="UInt" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/1/mesh/topology</DataItem>
+        </Topology>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="2423 2" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/1/mesh/geometry</DataItem>
+        </Geometry>
+        <Time Value="0.02" />
+        <Attribute Name="u" AttributeType="Vector" Center="Node">
+          <DataItem Dimensions="2423 3" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/VisualisationVector/1</DataItem>
+        </Attribute>
+      </Grid>
+      <Grid Name="mesh" GridType="Uniform">
+        <Topology NumberOfElements="4596" TopologyType="Triangle" NodesPerElement="3">
+          <DataItem Dimensions="4596 3" NumberType="UInt" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/2/mesh/topology</DataItem>
+        </Topology>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="2423 2" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/2/mesh/geometry</DataItem>
+        </Geometry>
+        <Time Value="0.029999999999999999" />
+        <Attribute Name="u" AttributeType="Vector" Center="Node">
+          <DataItem Dimensions="2423 3" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/VisualisationVector/2</DataItem>
+        </Attribute>
+      </Grid>
+      <Grid Name="mesh" GridType="Uniform">
+        <Topology NumberOfElements="4596" TopologyType="Triangle" NodesPerElement="3">
+          <DataItem Dimensions="4596 3" NumberType="UInt" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/3/mesh/topology</DataItem>
+        </Topology>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="2423 2" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/3/mesh/geometry</DataItem>
+        </Geometry>
+        <Time Value="0.040000000000000001" />
+        <Attribute Name="u" AttributeType="Vector" Center="Node">
+          <DataItem Dimensions="2423 3" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/VisualisationVector/3</DataItem>
+        </Attribute>
+      </Grid>
+      <Grid Name="mesh" GridType="Uniform">
+        <Topology NumberOfElements="4596" TopologyType="Triangle" NodesPerElement="3">
+          <DataItem Dimensions="4596 3" NumberType="UInt" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/4/mesh/topology</DataItem>
+        </Topology>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="2423 2" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/4/mesh/geometry</DataItem>
+        </Geometry>
+        <Time Value="0.050000000000000003" />
+        <Attribute Name="u" AttributeType="Vector" Center="Node">
+          <DataItem Dimensions="2423 3" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/VisualisationVector/4</DataItem>
+        </Attribute>
+      </Grid>
+      <Grid Name="mesh" GridType="Uniform">
+        <Topology NumberOfElements="4596" TopologyType="Triangle" NodesPerElement="3">
+          <DataItem Dimensions="4596 3" NumberType="UInt" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/5/mesh/topology</DataItem>
+        </Topology>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="2423 2" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/5/mesh/geometry</DataItem>
+        </Geometry>
+        <Time Value="0.060000000000000005" />
+        <Attribute Name="u" AttributeType="Vector" Center="Node">
+          <DataItem Dimensions="2423 3" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/VisualisationVector/5</DataItem>
+        </Attribute>
+      </Grid>
+      <Grid Name="mesh" GridType="Uniform">
+        <Topology NumberOfElements="4596" TopologyType="Triangle" NodesPerElement="3">
+          <DataItem Dimensions="4596 3" NumberType="UInt" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/6/mesh/topology</DataItem>
+        </Topology>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="2423 2" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/Mesh/6/mesh/geometry</DataItem>
+        </Geometry>
+        <Time Value="0.069999999999999993" />
+        <Attribute Name="u" AttributeType="Vector" Center="Node">
+          <DataItem Dimensions="2423 3" Format="HDF">u_l1_p1_bfs2_tem1_Re2000_beta_auto_.h5:/VisualisationVector/6</DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
