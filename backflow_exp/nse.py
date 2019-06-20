@@ -108,15 +108,15 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         suf = 'p1_' + suf
     suf = 'l{}_'.format(level) + suf
 
-    # xdmf_u = XDMFFile('results/u_' + suf + '.xdmf')
-    # xdmf_p = XDMFFile('results/p_' + suf + '.xdmf')
-    # xdmf_tau = XDMFFile('tau_sd_' + suf + '.xdmf')
-    # xdmf_u.parameters['rewrite_function_mesh'] = False
-    # xdmf_p.parameters['rewrite_function_mesh'] = False
-    # xdmf_tau.parameters['rewrite_function_mesh'] = False
-    #
-    # u0.rename('u', 'u')
-    # p0.rename('p', 'p')
+    xdmf_u = XDMFFile('results/u_' + suf + '.xdmf')
+    xdmf_p = XDMFFile('results/p_' + suf + '.xdmf')
+    xdmf_tau = XDMFFile('tau_sd_' + suf + '.xdmf')
+    xdmf_u.parameters['rewrite_function_mesh'] = False
+    xdmf_p.parameters['rewrite_function_mesh'] = False
+    xdmf_tau.parameters['rewrite_function_mesh'] = False
+
+    u0.rename('u', 'u')
+    p0.rename('p', 'p')
 
     w0 = Function(W)
     r0, s0 = w0.split()
@@ -232,10 +232,10 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         ### Creating Gershgorin Circles of Reduced Matrix
         circles = HF.GregsCircles(laplace_backflow_final)
         fig = HF.plotCircles(circles, round(t, 2), stabmethod, assemble(beta*ds(2)))
-        smalleig = ssl.eigs(lapmat2, 5, sigma=1e-6, which='LM', return_eigenvectors=False)
+        smalleig = ssl.eigs(lapmat2, 5, sigma=-10, which='LM', return_eigenvectors=False)
         eigenvals = LA.eigvals(laplace_backflow_final)
         for EV in smalleig:
-            plt.plot(EV.real, EV.imag, 'go')
+            plt.plot(EV.real, EV.imag, 'wo')
         for eigval in eigenvals:
             plt.plot(eigval.real, eigval.imag, 'r+')
         # fig = plt.figure()
@@ -262,8 +262,8 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # print('Incoming energy change:', incEnergyVec[(int)(t/dt) - 1])
         # print('Numerical energy:', numEnergyVec[(int)(t/dt) - 1])
 
-        # xdmf_u.write(u0, t)
-        # xdmf_p.write(p0, t)
+        xdmf_u.write(u0, t)
+        xdmf_p.write(p0, t)
         pt.update()
     pt.finish()
 
@@ -279,14 +279,14 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     # plt.title('Energy changes of ' + stabmethod)
     # plt.show()
 
-    # del xdmf_u, xdmf_p
+    del xdmf_u, xdmf_p
 
 
 if __name__ == '__main__':
     Re = [2000]
 
     for Re_ in Re:
-        nse(Re_, level=1, temam=True, bfs=3, velocity_degree=1, eps=0.0001, dt=0.01)
+        nse(Re_, level=1, temam=True, bfs=1, velocity_degree=1, eps=0.0001, dt=0.01)
 
         ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
 
