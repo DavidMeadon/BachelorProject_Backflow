@@ -74,7 +74,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         F += 0.5 * rho * div(u0) * dot(u_, v) * dx
 
     beta = Constant(1)               #TODO add initial values, probably 1
-    gamma = Constant(1)
+    gamma = Constant(1000)
 
     backflow_func = 0.5 * rho * HF.abs_n(dot(u0, n)) * dot(u_, v) * ds(2) #0.5 * rho * HF.abs_n(div(u0)) * dot(u_, v) * dx
 
@@ -97,8 +97,9 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         param = 'gamma'
         stabmethod = 'velocity gradient penalization'
         Ctgt = h ** 2
-        G = gamma * Ctgt * 0.5 * rho * HF.abs_n(dot(u0, n)) * (
-                Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
+        # G = gamma * Ctgt * 0.5 * rho * HF.abs_n(dot(u0, n)) * (
+        #         Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
+        G = 1 * gamma * Ctgt * (Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
         F -= G
     elif velocity_degree == 1 and float(eps):
         F += eps / mu * h ** 2 * inner(grad(p_), grad(q)) * dx
@@ -118,7 +119,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     # elif velocity_degree == 1 and float(eps):
     #     F += eps/mu*h**2*inner(grad(p_), grad(q))*dx
     numerical = 0.5 * rho * k * dot(u_ - u0, u_ - u0) * dx
-    testfunc = laplace + backflow_func - G + numerical
+    testfunc = backflow_func - G #+ laplace + numerical
 
     a = lhs(F)
     L = rhs(F)
@@ -138,7 +139,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     if auto:
         runtype = "auto"
     elif param == 'beta':
-        runtype = round(assemble(beta * ds(2)))
+        runtype = round(assemble(beta * ds(2)), 3)
     elif param == 'gamma':
         runtype = round(assemble(gamma * ds(2)))
 
@@ -239,7 +240,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         # print(numEnergyVec[(int)(t / dt) - 1])
 
         if bfs == 3 and auto:
-            numericalfunc = 0.5 * rho * dot(u0 - r0, u0 - r0) * dx
+            numericalfunc = 0#0.5 * rho * dot(u0 - r0, u0 - r0) * dx
             backflow_mat = assemble(lhs(backflow_func))
             backflow_vec = np.array(backflow_mat.array())
             #
@@ -247,7 +248,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
             while True:
                 ### Building matrix and applying eigenvalues
                 lap = assemble(lhs(testfunc + numericalfunc))
-                for bc in bcs: bc.apply(lap)
+                # for bc in bcs: bc.apply(lap)
                 lapmat = np.array(lap.array())
                 # lapmat += np.eye(lapmat.shape[0])
                 reduced_laplace = lapmat * (backflow_vec != 0)
@@ -262,7 +263,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
                 if plotcircles == 1:
 
                     circles = HF.GregsCircles(laplace_backflow_final)
-                    fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, round(assemble(gamma*ds(2)), 3))
+                    fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, runtype)
 
                     if plotcircles == 2:
                         lapmat2 = sp.sparse.bsr_matrix(lapmat)  # Sparse Version
@@ -287,7 +288,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
             # print(round(assemble(gamma * ds(2))))
         elif (bfs == 1 or bfs == 2) and auto:
-            numericalfunc = 0.5 * rho * dot(u0 - r0, u0 - r0) * dx
+            numericalfunc = 0#0.5 * rho * dot(u0 - r0, u0 - r0) * dx
             #     # numericalEn = assemble(numericalfunc)
             #     # print(numericalEn)
             #
@@ -300,7 +301,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
             while True:
                 ### Building matrix and applying eigenvalues
                 lap = assemble(lhs(testfunc + numericalfunc))
-                for bc in bcs: bc.apply(lap)
+                # for bc in bcs: bc.apply(lap)
                 lapmat = np.array(lap.array())
                 # lapmat += np.eye(lapmat.shape[0])
                 reduced_laplace = lapmat * (backflow_vec != 0)
@@ -315,13 +316,14 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
                 if plotcircles == 1:
 
                     circles = HF.GregsCircles(laplace_backflow_final)
-                    fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, round(assemble(beta*ds(2)), 3))
+                    fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, runtype)
 
                     if plotcircles == 2:
                         lapmat2 = sp.sparse.bsr_matrix(lapmat)  # Sparse Version
                         smalleig = ssl.eigs(lapmat2, 5, sigma=-10, which='LM', return_eigenvectors=False)
                         for EV in smalleig:
                             plt.plot(EV.real, EV.imag, 'wo')
+
 
                     for eigval in eigenvals:
                         plt.plot(eigval.real, eigval.imag, 'r+')
@@ -341,9 +343,10 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
                     beta.assign(betanew)
                     del lap, lapmat, laplace_backflow_final, eigenvals
         if plotcircles > 0 and not auto:
-            numericalfunc = 0.5 * rho * dot(u0 - r0, u0 - r0) * dx
+            numericalfunc = 0#0.5 * rho * dot(u0 - r0, u0 - r0) * dx
             backflow_mat = assemble(lhs(backflow_func))
             backflow_vec = np.array(backflow_mat.array())
+
 
             lap = assemble(lhs(testfunc + numericalfunc))
             for bc in bcs: bc.apply(lap)
@@ -354,17 +357,17 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
                 laplace_backflow.transpose()[~(laplace_backflow.transpose() == 0).all(1)])
             eigenvals = LA.eigvals(laplace_backflow_final)
             circles = HF.GregsCircles(laplace_backflow_final)
-            fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, round(assemble(beta * ds(2)), 3))
+            fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, runtype)
 
             if plotcircles == 2:
                 lapmat2 = sp.sparse.bsr_matrix(lapmat)  # Sparse Version
                 smalleig = ssl.eigs(lapmat2, 5, sigma=-10, which='LM', return_eigenvectors=False)
                 for EV in smalleig:
-                    plt.plot(EV.real, EV.imag, 'wo')
+                    plt.plot(EV.real, EV.imag, 'ko')
+                print(smalleig.min())
 
             for eigval in eigenvals:
                 plt.plot(eigval.real, eigval.imag, 'r+')
-
             fig.savefig('circles/' + str(round(t * 100)) + 'gersh.png')
             plt.close(fig)
             # print(round(assemble(beta * ds(2)), 5))
@@ -407,7 +410,7 @@ if __name__ == '__main__':
     Re = [5000]
 
     for Re_ in Re:
-        nse(Re_, level=1, temam=True, bfs=3, velocity_degree=1, eps=0.0001, dt=0.01, auto=False, plotcircles=0)
+        nse(Re_, level=1, temam=True, bfs=3, velocity_degree=1, eps=0.0001, dt=0.01, auto=False, plotcircles=2)
 
         ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
 
