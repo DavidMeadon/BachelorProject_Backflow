@@ -74,7 +74,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         F += 0.5 * rho * div(u0) * dot(u_, v) * dx
 
     beta = Constant(1)               #TODO add initial values, probably 1
-    gamma = Constant(1000)
+    gamma = Constant(1)
 
     backflow_func = 0.5 * rho * HF.abs_n(dot(u0, n)) * dot(u_, v) * ds(2) #0.5 * rho * HF.abs_n(div(u0)) * dot(u_, v) * dx
 
@@ -97,14 +97,14 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         param = 'gamma'
         stabmethod = 'tangential penalization'
         Ctgt = h ** 2
-        # G = gamma * Ctgt * 0.5 * rho * HF.abs_n(dot(u0, n)) * (
-        #         Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
+        G = gamma * Ctgt * 0.5 * rho * HF.abs_n(dot(u0, n)) * (
+                Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
     elif bfs == 4:
         param = 'gamma'
         stabmethod = 'tangential penalization - 2016 paper'
         Ctgt = h ** 2
-        max1 = HF.abs_n(u0)
-        max2 = np.array(max1.vector().array())
+        max1 = assemble(HF.abs_n(dot(u0, n))*ds(2))
+        max2 = np.array(max1.array())
         max3 = abs(max2)
         maxi = max3.max()
         G = -1 * gamma * maxi * 0.5 * rho * Ctgt * (Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
@@ -357,7 +357,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
 
             lap = assemble(lhs(testfunc + numericalfunc))
-            for bc in bcs: bc.apply(lap)
+            # for bc in bcs: bc.apply(lap)
             lapmat = np.array(lap.array())
             reduced_laplace = lapmat * (backflow_vec != 0)
             laplace_backflow = reduced_laplace[~(reduced_laplace == 0).all(1)]
@@ -366,16 +366,28 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
             eigenvals = LA.eigvals(laplace_backflow_final)
             circles = HF.GregsCircles(laplace_backflow_final)
             fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, runtype)
-
-            if plotcircles == 2:
+            if plotcircles == 2 and eigenvals.size > 0:
                 lapmat2 = sp.sparse.bsr_matrix(lapmat)  # Sparse Version
                 smalleig = ssl.eigs(lapmat2, 5, sigma=-10, which='LM', return_eigenvectors=False)
+                printlab = True
                 for EV in smalleig:
-                    plt.plot(EV.real, EV.imag, 'ko')
+                    if printlab:
+                        plt.plot(EV.real, EV.imag, 'ko', label='Eigenvalues of full Matrix')
+                        printlab = False
+                    else:
+                        plt.plot(EV.real, EV.imag, 'ko', label='_nolegend_')
                 print(smalleig.min())
-
+            printlab = True
             for eigval in eigenvals:
-                plt.plot(eigval.real, eigval.imag, 'r+')
+                if printlab:
+                    plt.plot(eigval.real, eigval.imag, 'r+', label='Eigenvalues of reduced Matrix')
+                    printlab = False
+                else:
+                    plt.plot(eigval.real, eigval.imag, 'r+', label='_nolegend_')
+
+
+
+            plt.legend()
             fig.savefig('circles/' + str(round(t * 100)) + 'gersh.png')
             plt.close(fig)
             # print(round(assemble(beta * ds(2)), 5))
@@ -418,7 +430,7 @@ if __name__ == '__main__':
     Re = [5000]
 
     for Re_ in Re:
-        nse(Re_, level=1, temam=True, bfs=4, velocity_degree=1, eps=0.0001, dt=0.01, auto=False, plotcircles=2)
+        nse(Re_, level=1, temam=True, bfs=3, velocity_degree=1, eps=0.0001, dt=0.01, auto=False, plotcircles=2)
 
         ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
 
