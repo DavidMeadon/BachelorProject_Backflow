@@ -95,11 +95,19 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         F -= G
     elif bfs == 3:
         param = 'gamma'
-        stabmethod = 'velocity gradient penalization'
+        stabmethod = 'tangential penalization'
         Ctgt = h ** 2
         # G = gamma * Ctgt * 0.5 * rho * HF.abs_n(dot(u0, n)) * (
         #         Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
-        G = 1 * gamma * Ctgt * (Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
+    elif bfs == 4:
+        param = 'gamma'
+        stabmethod = 'tangential penalization - 2016 paper'
+        Ctgt = h ** 2
+        max1 = HF.abs_n(u0)
+        max2 = np.array(max1.vector().array())
+        max3 = abs(max2)
+        maxi = max3.max()
+        G = -1 * gamma * maxi * 0.5 * rho * Ctgt * (Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
         F -= G
     elif velocity_degree == 1 and float(eps):
         F += eps / mu * h ** 2 * inner(grad(p_), grad(q)) * dx
@@ -410,7 +418,7 @@ if __name__ == '__main__':
     Re = [5000]
 
     for Re_ in Re:
-        nse(Re_, level=1, temam=True, bfs=3, velocity_degree=1, eps=0.0001, dt=0.01, auto=False, plotcircles=2)
+        nse(Re_, level=1, temam=True, bfs=4, velocity_degree=1, eps=0.0001, dt=0.01, auto=False, plotcircles=2)
 
         ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
 
