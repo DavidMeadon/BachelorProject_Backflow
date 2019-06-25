@@ -156,7 +156,11 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     elif param == 'gamma':
         runtype = round(assemble(gamma * ds(2)))
     else:
+<<<<<<< HEAD
         runtype = "NoStab"
+=======
+        runtype = 'nostab'
+>>>>>>> 5f461d369ef238743a03dd5f59ca78db89e7b635
 
     suf = 'bfs{}_tem{}_Re{}_'.format(int(bfs), int(temam), Re) + param + '_' + '{}_'.format(runtype)
     if velocity_degree == 1:
@@ -372,9 +376,15 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
             
             eigenvals = []
             
+<<<<<<< HEAD
             maxi.assign(HF.maxUneg(W,mesh,u0))
             print("new maxi is: {}".format(float(maxi)))
             #maxi.assign(Constant(maxiv))
+=======
+            maxiv   =   HF.maxUneg(W,mesh,u0)
+            print(maxiv)
+            maxi.assign(Constant(maxiv))
+>>>>>>> 5f461d369ef238743a03dd5f59ca78db89e7b635
             
             if len(laplace_backflow_final)>0:
                 eigenvals = LA.eigvals(laplace_backflow_final)
@@ -448,7 +458,11 @@ if __name__ == '__main__':
     Re = [5000]
 
     for Re_ in Re:
+<<<<<<< HEAD
         nse(Re_, level=1, temam=True, bfs=0, velocity_degree=1, eps=0.0001, dt=0.01, auto=False, plotcircles=2)
+=======
+        nse(Re_, level=1, temam=True, bfs=4, velocity_degree=1, eps=0.0001, dt=0.01, auto=False, plotcircles=2)
+>>>>>>> 5f461d369ef238743a03dd5f59ca78db89e7b635
 
         ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
 
