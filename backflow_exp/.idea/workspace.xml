@@ -2,41 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="235a48e3-d364-4eeb-9814-60687671b545" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/nse_test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HelperFuncs.py" beforeDir="false" afterPath="$PROJECT_DIR$/HelperFuncs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/10.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/10.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/11.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/11.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/13.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/13.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/14.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/14.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/15.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/15.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/16.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/16.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/17.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/17.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/18.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/18.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/19.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/19.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/20.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/20.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/21.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/21.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/22.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/22.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/23.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/23.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/24.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/24.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/25.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/25.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/26.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/26.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/27.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/27.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/28.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/28.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/29.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/29.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/30.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/30.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/31.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/31.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/32.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/32.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/33.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/33.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/34.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/34.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/35.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/35.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/36.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/36.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/37.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/37.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/38.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/38.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/39.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/39.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/circles/40.0gersh.png" beforeDir="false" afterPath="$PROJECT_DIR$/circles/40.0gersh.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/p_l1_p1_bfs3_tem1_Re5000_gamma_1_.h5" beforeDir="false" afterPath="$PROJECT_DIR$/results/p_l1_p1_bfs3_tem1_Re5000_gamma_1_.h5" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/u_l1_p1_bfs3_tem1_Re5000_gamma_1_.h5" beforeDir="false" afterPath="$PROJECT_DIR$/results/u_l1_p1_bfs3_tem1_Re5000_gamma_1_.h5" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nse.py" beforeDir="false" afterPath="$PROJECT_DIR$/nse.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -49,23 +15,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/nse.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5656">
-              <caret line="451" column="69" selection-start-line="451" selection-start-column="69" selection-end-line="451" selection-end-column="69" />
+            <state relative-caret-position="1738">
+              <caret line="384" column="59" selection-start-line="384" selection-start-column="59" selection-end-line="384" selection-end-column="59" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
-                <marker date="1561460200340" expanded="true" signature="16932:16950" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/testpoisson.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="56" column="27" selection-start-line="56" selection-start-column="27" selection-end-line="56" selection-end-column="27" />
-              <folding>
-                <element signature="e#0#20#0" expanded="true" />
+                <marker date="1561473259486" expanded="true" signature="16937:16955" ph="..." />
               </folding>
             </state>
           </provider>
@@ -103,9 +57,9 @@
       <list>
         <option value="$PROJECT_DIR$/testpoisson.py" />
         <option value="$USER_HOME$/Documents/For Junus/seq2h5.py" />
-        <option value="$PROJECT_DIR$/nse.py" />
         <option value="$PROJECT_DIR$/HelperFuncs.py" />
         <option value="$PROJECT_DIR$/nse_test.py" />
+        <option value="$PROJECT_DIR$/nse.py" />
       </list>
     </option>
   </component>
@@ -218,6 +172,9 @@
       <module name="backflow_exp" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -306,16 +263,17 @@
       <workItem from="1561106778795" duration="7307000" />
       <workItem from="1561368352742" duration="9313000" />
       <workItem from="1561449407516" duration="9610000" />
+      <workItem from="1561473112105" duration="200000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="43183000" />
+    <option name="totallyTimeSpent" value="43383000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="25" width="1922" height="1176" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26307365" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26627535" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -334,8 +292,8 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="SciView" order="3" sideWeight="0.9222065" weight="0.5517609" />
-      <window_info anchor="right" x="0" y="0" width="430" height="976" id="Documentation" order="4" sideWeight="0.077793494" side_tool="true" visible="true" weight="0.24172892" />
+      <window_info anchor="right" id="SciView" order="3" sideWeight="0.9207921" visible="true" weight="0.5517609" />
+      <window_info anchor="right" x="0" y="0" width="430" height="976" id="Documentation" order="4" sideWeight="0.07920792" side_tool="true" visible="true" weight="0.5517609" />
       <window_info anchor="right" id="Database" order="5" />
     </layout>
     <layout-to-restore>
@@ -387,16 +345,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/testpoisson.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="56" column="27" selection-start-line="56" selection-start-column="27" selection-end-line="56" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/nse_test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="379">
@@ -417,13 +365,32 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nse.py">
+    <entry file="file://$PROJECT_DIR$/testpoisson.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5656">
-          <caret line="451" column="69" selection-start-line="451" selection-start-column="69" selection-end-line="451" selection-end-column="69" />
+        <state relative-caret-position="627">
+          <caret line="56" column="27" selection-start-line="56" selection-start-column="27" selection-end-line="56" selection-end-column="27" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
-            <marker date="1561460200340" expanded="true" signature="16932:16950" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nse_backup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4590">
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nse.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1738">
+          <caret line="384" column="59" selection-start-line="384" selection-start-column="59" selection-end-line="384" selection-end-column="59" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+            <marker date="1561473259486" expanded="true" signature="16937:16955" ph="..." />
           </folding>
         </state>
       </provider>

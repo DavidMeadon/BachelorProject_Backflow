@@ -382,7 +382,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
                         printlab = False
                     else:
                         plt.plot(EV.real, EV.imag, 'ko', label='_nolegend_')
-                print(small_eigenvals_stabMatrix.min())
+                print(small_eigenvals_stabMatrix.min().real)
                 del small_eigenvals_stabMatrix, stabMatrix_sparse
             printlab = True
             for eigval in eigenvals_reduced_stabMatrix:
@@ -437,7 +437,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 if __name__ == '__main__':
     Re = [5000]
 
-    gammaVec = 10**np.arange(3.)
+    gammaVec = 10**np.arange(1.)
 
     eigsarr = []
     for Re_ in Re:
