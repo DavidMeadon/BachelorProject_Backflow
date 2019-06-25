@@ -20,6 +20,8 @@ def abs_n(x):
 def maxUneg(W,mesh,u0):
     coords  =   mesh.coordinates()
     eps     =   1e-5
+    eps     =   0.033
+    #eps     =   mesh.hmin()
     # This is need to have done in order to extract the x component of u0 
     Vx      =   W.sub(0).sub(0).collapse()
     vx      =   Function(Vx)
@@ -27,8 +29,12 @@ def maxUneg(W,mesh,u0):
     # specifically for the line in x=5
     uval    =   vx.vector().get_local()
     uneg    =   uval[np.where(coords[:,0]>5-eps)]
-    #print(np.any(uneg<0))
-    return np.min(uneg)
+    ucandidate  =   np.min(uneg)   
+    
+    if ucandidate>0:
+        ucandidate = 0  
+    
+    return np.abs(ucandidate)
     
     
     
