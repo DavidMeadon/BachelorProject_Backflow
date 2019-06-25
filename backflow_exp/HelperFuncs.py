@@ -6,6 +6,7 @@ import scipy.sparse.linalg as ssl
 from numpy import linalg as LA
 from math import fabs
 
+
 def abs_n(x):
     return 0.5 * (x - abs(x))
 
@@ -16,6 +17,19 @@ def abs_n(x):
 #         return 1
 #     else:
 #         return 0
+
+def maxUneg(W, mesh, u0):
+    coords = mesh.coordinates()
+    eps = 1e-5
+    # This is need to have done in order to extract the x component of u0
+    Vx = W.sub(0).sub(0).collapse()
+    vx = Function(Vx)
+    LagrangeInterpolator.interpolate(vx, u0.sub(0))
+    # specifically for the line in x=5
+    uval = vx.vector().get_local()
+    uneg = uval[np.where(coords[:, 0] > 5 - eps)]
+    # print(np.any(uneg<0))
+    return np.min(uneg)
 
 
 def is_pos_def(A):
@@ -33,8 +47,8 @@ def is_pos_def(A):
 
 
 def diag_dom(X):
-    D = np.diag(np.abs(X)) # Find diagonal coefficients
-    S = np.sum(np.abs(X), axis=1) - D # Find row sum without diagonal
+    D = np.diag(np.abs(X))  # Find diagonal coefficients
+    S = np.sum(np.abs(X), axis=1) - D  # Find row sum without diagonal
     if np.all(D >= S):
         sol = 'Matrix is diagonally dominant'
         return sol
@@ -92,19 +106,21 @@ def isSquare(m):
             return False
     return True
 
+
 def GregsCircles(matrix):
     if isSquare(matrix) != True:
         print('Your input matrix is not square!')
         return []
     circles = []
-    for x in range(0,len(matrix)):
+    for x in range(0, len(matrix)):
         radius = 0
         piv = matrix[x][x]
-        for y in range(0,len(matrix)):
+        for y in range(0, len(matrix)):
             if x != y:
                 radius += fabs(matrix[x][y])
-        circles.append([piv,radius])
+        circles.append([piv, radius])
     return circles
+
 
 def plotCircles(circles, t, bfsm, param, paramval):
     fig, ax = plt.subplots()
@@ -114,21 +130,21 @@ def plotCircles(circles, t, bfsm, param, paramval):
     if circles == []:
         return fig
     index, radi = zip(*circles)
-    Xupper = 10#max(index) + np.std(index)
-    Xlower = -10#min(index) - np.std(index)
+    Xupper = 10  # max(index) + np.std(index)
+    Xlower = -10  # min(index) - np.std(index)
     Ylimit = max(radi) + np.std(index)
     ax = plt.gca()
     ax.cla()
-    ax.set_xlim((Xlower,Xupper))
-    ax.set_ylim((-Ylimit,Ylimit))
+    ax.set_xlim((Xlower, Xupper))
+    ax.set_ylim((-Ylimit, Ylimit))
     plt.title('Method: ' + bfsm + ', Time: ' + str(t) + ', ' + param + ' = ' + str(paramval))
     plt.xlabel('Real Axis')
     plt.ylabel('Imaginary Axis')
-    for x in range(0,len(circles)):
-        circ = plt.Circle((index[x],0), radius = radi[x])
+    for x in range(0, len(circles)):
+        circ = plt.Circle((index[x], 0), radius=radi[x])
         ax.add_artist(circ)
-    ax.plot([Xlower,Xupper],[0,0],'k--')
-    ax.plot([0,0],[-Ylimit,Ylimit],'k--')
+    ax.plot([Xlower, Xupper], [0, 0], 'k--')
+    ax.plot([0, 0], [-Ylimit, Ylimit], 'k--')
     return fig
 
 
