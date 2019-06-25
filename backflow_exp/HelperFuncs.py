@@ -17,6 +17,22 @@ def abs_n(x):
 #     else:
 #         return 0
 
+def maxUneg(W,mesh,u0):
+    coords  =   mesh.coordinates()
+    eps     =   1e-5
+    # This is need to have done in order to extract the x component of u0 
+    Vx      =   W.sub(0).sub(0).collapse()
+    vx      =   Function(Vx)
+    LagrangeInterpolator.interpolate(vx,u0.sub(0))
+    # specifically for the line in x=5
+    uval    =   vx.vector().get_local()
+    uneg    =   uval[np.where(coords[:,0]>5-eps)]
+    #print(np.any(uneg<0))
+    return np.min(uneg)
+    
+    
+    
+
 
 def is_pos_def(A):
     if np.allclose(A, A.T):
