@@ -1,3 +1,44 @@
-\mychapter{2}{Derivation of weak/variational form}
-\lipsum
-\lipsum
+% \mychapter{2}{Automating the parameter}
+\chapter{Automating the parameter} %Chapter title needs work
+
+
+The first step we will take in automating the stabilising parameters will be to look at exactly what makes the problem stable, i.e. why does The main criterion for stability that we will be using is that we want the full backflow terms (backflow + stabilising) to have positive eigenvalues in their discretised form. 
+
+\section{Stability criterion}
+
+In order to automate the parameters used in the stabilisation process, we first need some stability criterion that we can check and use to ensure that the parameter we are using is indeed guaranteeing stability. To find this criterion we first consider the change of energy of the system. We require the that the energy of the system not increase... and thus we would like in the discretised form that the problem is positive definite.
+
+\section{Stabilisation}
+
+As mentioned during the introduction there are two types of stabilisation we will be considering:
+\begin{itemize}
+    \item Velocity Penalisation:
+    \[
+    S = \beta\frac{\rho}{2}\int_{\Gamma_N} \abs{\bm{u} \cdot \bm{n} }_- \bm{u} \cdot \bm{v}
+    \]
+    where beta is the stabilisation parameter.
+    \item Tangential Derivative Penalisation:
+    \[
+    S = \gamma\frac{\rho}{2}h^{2}\int_{\Gamma_N} \abs{\bm{u} \cdot \bm{n} }_- \qty(t^{T}\nabla\bm{u} \cdot t^{T}\nabla\bm{v})
+    \]
+    where gamma is the stabilisation parameter and \mathm{t} are the tangential directions
+\end{itemize}
+
+There are some important formula which we will continually use and refer to so for convenience they are listed here for ease of reference:
+\begin{itemize}
+    \item Backflow term:\\
+    \[
+    B = \frac{\rho}{2}\int_{\Gamma_N} \abs{\bm{u} \cdot \bm{n} }_- \norm{\bm{u}}^2
+    \]
+    \item Stabilisation test
+    \[
+    T = -B + S
+    \]
+\end{itemize}
+
+
+\section{Reduction of eigenvalue problem}
+
+Finding the eigenvalues of the entire backflow terms matrix will in general be exceptionally expensive due to the size of the matrix, however we can reduce the problem by first noting that the discretisation of the bad backflow term will be zero everywhere except where backflow occurs, namely where the problems occur. So we can therefore reduce the problem to only considering the sub-matrix where the backflow actually occurs. We do this by first considering the discretised form of the backflow term\includecomment{refer here to relevant to equation} who's matrix will be zero almost everywhere except for small sub-matrices where there is actually backflow. We then transform this matrix into one of zeros and ones, where it is zero if there is no backflow and 1 if there is backflow. Finally we then element-wise multiply this matrix with the stabilisation test matrix. We then extract the sub-matrices from this which are the nonzero square matrices where there is backflow. Finally these will be the reduced matrices over which we can calculate eigenvalues and use to automatically stabilise. An additional benefit of this procedure is that it allows us to stabilise different backflow regions with different parameters depending on the amount of backflow there, rather than the current regime where the entire system uses the same parameter irrespective of the amount of backflow.
+
+\section{Algorithms}
