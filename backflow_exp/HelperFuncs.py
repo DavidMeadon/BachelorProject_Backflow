@@ -50,9 +50,13 @@ def is_pos_def(A):
             print("Not Positive Definite")
             return False
     else:
-        print('Not Symmetric')
-        return False
-
+        try:
+            LA.cholesky(A @ A.T)
+            print("Positive Definite in weak sense")
+            return True
+        except:
+            print("Not Positive Definite")
+            return False
 
 def diag_dom(X):
     D = np.diag(np.abs(X)) # Find diagonal coefficients
@@ -60,11 +64,9 @@ def diag_dom(X):
     if np.all(D >= S):
         sol = 'Matrix is diagonally dominant'
         return sol
-        print(sol)
     else:
         sol = 'NOT diagonally dominant'
         return sol
-        print(sol)
     return
 
 

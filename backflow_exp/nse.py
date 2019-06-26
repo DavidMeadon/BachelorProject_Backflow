@@ -113,20 +113,6 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     elif velocity_degree == 1 and float(eps):
         F += eps / mu * h ** 2 * inner(grad(p_), grad(q)) * dx
 
-    # if temam:
-    #     F += 0.5*rho*div(u0)*dot(u_, v)*dx
-    #
-    # if bfs == 1:
-    #     F -= 0.5*rho*dot(u0, n)*dot(u_, v)*ds(2)
-    # elif bfs == 2:
-    #     F -= 0.5*rho*HF.abs_n(dot(u0, n))*dot(u_, v)*ds(2)
-    # elif bfs == 3:
-    #     Ctgt = h**2
-    #     F -= Ctgt*0.5*rho*HF.abs_n(dot(u0, n))*(
-    #         Dx(u[0], 1)*Dx(v[0], 1) + Dx(u[1], 1)*Dx(v[1], 1))*ds(2)
-    #
-    # elif velocity_degree == 1 and float(eps):
-    #     F += eps/mu*h**2*inner(grad(p_), grad(q))*dx
     numerical = 0.5 * rho * k * dot(u_ - u0, u_ - u0) * dx
     stabilisationTest = backflow_func - G #+ laplace + numerical
 
@@ -362,6 +348,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
             stabTensor = assemble(lhs(stabilisationTest + numericalfunc))
             # for bc in bcs: bc.apply(stabTensor)
             stabMatrix = np.array(stabTensor.array())
+            # print(np.allclose(stabMatrix, stabMatrix.T))
             stabMatrix_backflow = stabMatrix * (backflow_vec != 0)
             stabMatrix_backflow_Nozero = stabMatrix_backflow[~(stabMatrix_backflow == 0).all(1)]
             reduced_stabMatrix = np.transpose(
@@ -372,18 +359,20 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
             if plotcircles == 2 and eigenvals_reduced_stabMatrix.size > 0:
                 stabMatrix_sparse = sp.sparse.bsr_matrix(stabMatrix)  # Sparse Version
                 # print(stabMatrix_sparse)
-                small_eigenvals_stabMatrix = ssl.eigs(stabMatrix_sparse, 5, sigma=-10, which='LM', return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
+                # small_eigenvals_stabMatrix = ssl.eigs(stabMatrix_sparse, 5, sigma=-10, which='LM', return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
+                stabMatrix_mineig = ssl.eigs(stabMatrix_sparse, 1, which='SM', return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
+                stabMatrix_maxeig = ssl.eigs(stabMatrix_sparse, 1, which='LM', return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
                 if t > 0.245 and t < 0.255:
-                    eigvec = np.array([small_eigenvals_stabMatrix.min(), small_eigenvals_stabMatrix.max()])
+                    eigvec = np.array([stabMatrix_mineig, stabMatrix_maxeig])#np.array([small_eigenvals_stabMatrix.min(), small_eigenvals_stabMatrix.max()])
                 printlab = True
-                for EV in small_eigenvals_stabMatrix:
-                    if printlab:
-                        plt.plot(EV.real, EV.imag, 'ko', label='Eigenvalues of full Matrix')
-                        printlab = False
-                    else:
-                        plt.plot(EV.real, EV.imag, 'ko', label='_nolegend_')
-                print(small_eigenvals_stabMatrix.min().real)
-                del small_eigenvals_stabMatrix, stabMatrix_sparse
+                # for EV in small_eigenvals_stabMatrix:
+                #     if printlab:
+                #         plt.plot(EV.real, EV.imag, 'ko', label='Eigenvalues of full Matrix')
+                #         printlab = False
+                #     else:
+                #         plt.plot(EV.real, EV.imag, 'ko', label='_nolegend_')
+                # print(small_eigenvals_stabMatrix.min().real)
+                del stabMatrix_sparse#, small_eigenvals_stabMatrix
             printlab = True
             for eigval in eigenvals_reduced_stabMatrix:
                 if printlab:
@@ -437,7 +426,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 if __name__ == '__main__':
     Re = [5000]
 
-    gammaVec = 10**np.arange(1.)
+    gammaVec = 10**np.arange(3.)
 
     eigsarr = []
     for Re_ in Re:
@@ -446,12 +435,17 @@ if __name__ == '__main__':
 
     fig = plt.figure(1)
     idx = 0
+
+    #Need to add code to make the plot below work correctly
     for gamma in gammaVec:
-        curreigsvec = eigsarr[0]
+        curreigsvec = eigsarr[idx]
         plt.figure(1)
-        plt.plot(gamma, abs(curreigsvec[0].real - curreigsvec[1].real), 'coral')
+        if idx == 0:
+            plt.plot(gamma, abs(curreigsvec[0].real - curreigsvec[1].real), 'ro', label="abs(maxeig - mineig)")
+        else:
+            plt.plot(gamma, abs(curreigsvec[0].real - curreigsvec[1].real), 'ro', label='_nolegend_')
         idx += 1
-    plt.legend("abs(maxeig - mineig)")
+    plt.legend()
     plt.show()
 
         ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
