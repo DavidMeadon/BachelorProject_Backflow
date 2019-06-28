@@ -8,7 +8,7 @@ import progress as prog
 import HelperFuncs as HF
 
 
-def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002, dt=0.001, auto=False, plotcircles=0, gammagiv=1):
+def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002, dt=0.001, auto=False, plotcircles=0, gammagiv=1, betagiv=1):
 
     mesh_root = 'stenosis_f0.6'
     if level == 2:
@@ -73,7 +73,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     if temam:
         F += 0.5 * rho * div(u0) * dot(u_, v) * dx
 
-    beta = Constant(1)               #TODO add initial values, probably 1
+    beta = Constant(betagiv)               #TODO add initial values, probably 1
     gamma = Constant(gammagiv)
 
     backflow_func = 0.5 * rho * HF.abs_n(dot(u0, n)) * dot(u_, v) * ds(2) #0.5 * rho * HF.abs_n(div(u0)) * dot(u_, v) * dx
@@ -103,18 +103,18 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
         param = 'gamma'
         stabmethod = 'tangential penalization - 2016 paper'
         Ctgt = h ** 2
-        print(type(u0))
-        max1 = assemble(HF.abs_n(u0)*ds(2))
-        max2 = np.array(max1.array())
-        max3 = abs(max2)
-        maxi = max3.max()
+
+        maxiv = HF.maxUneg(W, mesh, u0)
+        # print("maxBFVelo is: {}".format(maxiv))
+        maxi = Constant(maxiv)
+
         G = -1 * gamma * maxi * 0.5 * rho * Ctgt * (Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
         F -= G
     elif velocity_degree == 1 and float(eps):
         F += eps / mu * h ** 2 * inner(grad(p_), grad(q)) * dx
 
     numerical = 0.5 * rho * k * dot(u_ - u0, u_ - u0) * dx
-    stabilisationTest = backflow_func - G #+ laplace + numerical
+    stabilisationTest = backflow_func - G #+ laplace #+ numerical
 
     a = lhs(F)
     L = rhs(F)
@@ -174,7 +174,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
     pt = prog.progress_timer(description='Time Iterations', n_iter=40)
     # MAIN SOLVING LOOP
-    eigvec = np.array([0, 0])
+    eigvec = []
     for t in np.arange(dt, T + dt, dt):
 
         # print('t = {}'.format(round(t, 2)))
@@ -237,41 +237,100 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
 
         if bfs == 3 and auto:
-            numericalfunc = 0#0.5 * rho * dot(u0 - r0, u0 - r0) * dx
+            numericalfunc = 0  # 0.5 * rho * dot(u0 - r0, u0 - r0) * dx
             backflow_mat = assemble(lhs(backflow_func))
             backflow_vec = np.array(backflow_mat.array())
-            #
-            gamma.assign(1)
+            # if np.nonzero(backflow_vec)[0].size > 0:
+            #     maxidx = np.array([np.nonzero(backflow_vec)[0].max(), np.nonzero(backflow_vec)[1].max()]).max()
+            #     minidx = np.array([np.nonzero(backflow_vec)[0].min(), np.nonzero(backflow_vec)[1].min()]).min()
+            #     for idx in range(minidx, maxidx + 1):
+            #         for idx2 in range(minidx, maxidx + 1):
+            #             backflow_vec[idx, idx2] = 1
+            gamma.assign(1)#float(gamma))
+            testthing = assemble(lhs(0.5 * rho * dot(u_ - v, u_ - v) * dx))
+            print(testthing)
             while True:
-                ### Building matrix and applying eigenvalues
+                print(float(gamma))
                 stabTensor = assemble(lhs(stabilisationTest + numericalfunc))
-                # for bc in bcs: bc.apply(stabTensor)
+                for bc in bcs: bc.apply(stabTensor)
                 stabMatrix = np.array(stabTensor.array())
-                # stabMatrix += np.eye(stabMatrix.shape[0])
+                # print(np.allclose(stabMatrix, stabMatrix.T))
+                # print(np.nonzero(backflow_vec))
                 stabMatrix_backflow = stabMatrix * (backflow_vec != 0)
                 stabMatrix_backflow_Nozero = stabMatrix_backflow[~(stabMatrix_backflow == 0).all(1)]
-
-                # stabMatrix_sparse = sp.sparse.bsr_matrix(stabMatrix) # Sparse Version
-
-                ### Creating reduced backflow matrix
                 reduced_stabMatrix = np.transpose(
                     stabMatrix_backflow_Nozero.transpose()[~(stabMatrix_backflow_Nozero.transpose() == 0).all(1)])
                 eigenvals_reduced_stabMatrix = LA.eigvals(reduced_stabMatrix)
-                if plotcircles == 1:
+                circles = HF.GregsCircles(reduced_stabMatrix)
+                fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, runtype)
+                if plotcircles == 2 and eigenvals_reduced_stabMatrix.size > 0:
+                    stabMatrix_sparse = sp.sparse.bsr_matrix(stabMatrix)  # Sparse Version
+                    # print(stabMatrix_sparse)
+                    small_eigenvals_stabMatrix = ssl.eigs(stabMatrix_sparse, 5, sigma=-5, which='LM',
+                                                          return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
+                    # if t > 0.245 and t < 0.255:
+                    #     stabMatrix_mineig = ssl.eigs(stabMatrix_sparse, 1, sigma=-5, which='LM',
+                    #                                  return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
+                    #     stabMatrix_maxeig = ssl.eigs(stabMatrix_sparse, 1, which='LM', return_eigenvectors=False,
+                    #                                  v0=np.ones(stabMatrix_sparse.shape[0]))
+                    #     eigvec = np.array([stabMatrix_mineig,
+                    #                        stabMatrix_maxeig])  # np.array([small_eigenvals_stabMatrix.min(), small_eigenvals_stabMatrix.max()])
+                    printlab = True
+                    for EV in small_eigenvals_stabMatrix:
+                        if printlab:
+                            plt.plot(EV.real, EV.imag, 'ko', label='Eigenvalues of full Matrix')
+                            printlab = False
+                        else:
+                            plt.plot(EV.real, EV.imag, 'ko', label='_nolegend_')
+                    print(small_eigenvals_stabMatrix.min().real)
+                    del stabMatrix_sparse, small_eigenvals_stabMatrix
+                printlab = True
+                for eigval in eigenvals_reduced_stabMatrix:
+                    if printlab:
+                        plt.plot(eigval.real, eigval.imag, 'r+', label='Eigenvalues of reduced Matrix')
+                        printlab = False
+                    else:
+                        plt.plot(eigval.real, eigval.imag, 'r+', label='_nolegend_')
 
-                    circles = HF.GregsCircles(reduced_stabMatrix)
-                    fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, runtype)
-
-                    if plotcircles == 2:
-                        stabMatrix_sparse = sp.sparse.bsr_matrix(stabMatrix)  # Sparse Version
-                        small_eigenvals_stabMatrix = ssl.eigs(stabMatrix_sparse, 5, sigma=-10, which='LM', return_eigenvectors=False)
-                        for EV in small_eigenvals_stabMatrix:
-                            plt.plot(EV.real, EV.imag, 'wo')
-
-                    for eigval in eigenvals_reduced_stabMatrix:
-                        plt.plot(eigval.real, eigval.imag, 'r+')
-                    fig.savefig('circles/' + str(round(t*100)) + 'gersh.png')
-                    plt.close(fig)
+                if eigenvals_reduced_stabMatrix.size > 0:
+                    plt.legend()
+                fig.savefig('circles/' + str(round(t * 100)) + 'gersh.png')
+                plt.close(fig)
+            # numericalfunc = 0#0.5 * rho * dot(u0 - r0, u0 - r0) * dx
+            # backflow_mat = assemble(lhs(backflow_func))
+            # backflow_vec = np.array(backflow_mat.array())
+            # #
+            # gamma.assign(1)
+            # while True:
+            #     ### Building matrix and applying eigenvalues
+            #     stabTensor = assemble(lhs(stabilisationTest + numericalfunc))
+            #     # for bc in bcs: bc.apply(stabTensor)
+            #     stabMatrix = np.array(stabTensor.array())
+            #     # stabMatrix += np.eye(stabMatrix.shape[0])
+            #     stabMatrix_backflow = stabMatrix * (backflow_vec != 0)
+            #     stabMatrix_backflow_Nozero = stabMatrix_backflow[~(stabMatrix_backflow == 0).all(1)]
+            #
+            #     # stabMatrix_sparse = sp.sparse.bsr_matrix(stabMatrix) # Sparse Version
+            #
+            #     ### Creating reduced backflow matrix
+            #     reduced_stabMatrix = np.transpose(
+            #         stabMatrix_backflow_Nozero.transpose()[~(stabMatrix_backflow_Nozero.transpose() == 0).all(1)])
+            #     eigenvals_reduced_stabMatrix = LA.eigvals(reduced_stabMatrix)
+            #     if plotcircles == 1:
+            #
+            #         circles = HF.GregsCircles(reduced_stabMatrix)
+            #         fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, runtype)
+            #
+            #         if plotcircles == 2:
+            #             stabMatrix_sparse = sp.sparse.bsr_matrix(stabMatrix)  # Sparse Version
+            #             small_eigenvals_stabMatrix = ssl.eigs(stabMatrix_sparse, 5, sigma=-10, which='LM', return_eigenvectors=False)
+            #             for EV in small_eigenvals_stabMatrix:
+            #                 plt.plot(EV.real, EV.imag, 'wo')
+            #
+            #         for eigval in eigenvals_reduced_stabMatrix:
+            #             plt.plot(eigval.real, eigval.imag, 'r+')
+            #         fig.savefig('circles/' + str(round(t*100)) + 'gersh.png')
+            #         plt.close(fig)
 
                 if eigenvals_reduced_stabMatrix.size == 0:
                     del stabTensor, stabMatrix, reduced_stabMatrix, eigenvals_reduced_stabMatrix
@@ -281,7 +340,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
                     break
                 else:
                     del stabTensor, stabMatrix, reduced_stabMatrix, eigenvals_reduced_stabMatrix
-                    gamma.assign(assemble(gamma * ds(2)) * 2)
+                    gamma.assign(float(gamma) * 2)
 
             # print(round(assemble(gamma * ds(2))))
         elif (bfs == 1 or bfs == 2) and auto:
@@ -339,53 +398,80 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
                     betanew -= 0.05
                     beta.assign(betanew)
                     del stabTensor, stabMatrix, reduced_stabMatrix, eigenvals_reduced_stabMatrix
-        if plotcircles > 0 and not auto:
-            numericalfunc = 0#0.5 * rho * dot(u0 - r0, u0 - r0) * dx
+        # if plotcircles > 0 and not auto:
+            # if bfs == 4:
+            #     maxiv = HF.maxUneg(W, mesh, u0)
+            #     # print(maxiv)
+            #     maxi.assign(maxiv)
+            # numericalfunc = 0#0.5 * rho * dot(u0 - r0, u0 - r0) * dx
+            # backflow_mat = assemble(lhs(backflow_func))
+            # backflow_vec = np.array(backflow_mat.array())
+            # # if np.nonzero(backflow_vec)[0].size > 0:
+            # #     maxidx = np.array([np.nonzero(backflow_vec)[0].max(), np.nonzero(backflow_vec)[1].max()]).max()
+            # #     minidx = np.array([np.nonzero(backflow_vec)[0].min(), np.nonzero(backflow_vec)[1].min()]).min()
+            # #     for idx in range(minidx, maxidx + 1):
+            # #         for idx2 in range(minidx, maxidx + 1):
+            # #             backflow_vec[idx, idx2] = 1
+            # stabTensor = assemble(lhs(stabilisationTest + numericalfunc))
+            # # for bc in bcs: bc.apply(stabTensor)
+            # stabMatrix = np.array(stabTensor.array())
+            # # print(np.allclose(stabMatrix, stabMatrix.T))
+            # # print(np.nonzero(backflow_vec))
+            # stabMatrix_backflow = stabMatrix * (backflow_vec != 0)
+            # stabMatrix_backflow_Nozero = stabMatrix_backflow[~(stabMatrix_backflow == 0).all(1)]
+            # reduced_stabMatrix = np.transpose(
+            #     stabMatrix_backflow_Nozero.transpose()[~(stabMatrix_backflow_Nozero.transpose() == 0).all(1)])
+            # eigenvals_reduced_stabMatrix = LA.eigvals(reduced_stabMatrix)
+            # circles = HF.GregsCircles(reduced_stabMatrix)
+            # fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, runtype)
+            #
+            #
+            #
+            # if t > 0.245 and t < 0.255 and eigenvals_reduced_stabMatrix.size > 0:
+        if t > 0.245 and t < 0.255:
             backflow_mat = assemble(lhs(backflow_func))
             backflow_vec = np.array(backflow_mat.array())
-
-
-            stabTensor = assemble(lhs(stabilisationTest + numericalfunc))
-            # for bc in bcs: bc.apply(stabTensor)
-            stabMatrix = np.array(stabTensor.array())
-            # print(np.allclose(stabMatrix, stabMatrix.T))
-            stabMatrix_backflow = stabMatrix * (backflow_vec != 0)
-            stabMatrix_backflow_Nozero = stabMatrix_backflow[~(stabMatrix_backflow == 0).all(1)]
-            reduced_stabMatrix = np.transpose(
-                stabMatrix_backflow_Nozero.transpose()[~(stabMatrix_backflow_Nozero.transpose() == 0).all(1)])
-            eigenvals_reduced_stabMatrix = LA.eigvals(reduced_stabMatrix)
-            circles = HF.GregsCircles(reduced_stabMatrix)
-            fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, runtype)
-            if plotcircles == 2 and eigenvals_reduced_stabMatrix.size > 0:
-                stabMatrix_sparse = sp.sparse.bsr_matrix(stabMatrix)  # Sparse Version
-                # print(stabMatrix_sparse)
-                # small_eigenvals_stabMatrix = ssl.eigs(stabMatrix_sparse, 5, sigma=-10, which='LM', return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
-                stabMatrix_mineig = ssl.eigs(stabMatrix_sparse, 1, which='SM', return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
-                stabMatrix_maxeig = ssl.eigs(stabMatrix_sparse, 1, which='LM', return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
-                if t > 0.245 and t < 0.255:
-                    eigvec = np.array([stabMatrix_mineig, stabMatrix_maxeig])#np.array([small_eigenvals_stabMatrix.min(), small_eigenvals_stabMatrix.max()])
-                printlab = True
-                # for EV in small_eigenvals_stabMatrix:
-                #     if printlab:
-                #         plt.plot(EV.real, EV.imag, 'ko', label='Eigenvalues of full Matrix')
-                #         printlab = False
-                #     else:
-                #         plt.plot(EV.real, EV.imag, 'ko', label='_nolegend_')
-                # print(small_eigenvals_stabMatrix.min().real)
-                del stabMatrix_sparse#, small_eigenvals_stabMatrix
-            printlab = True
-            for eigval in eigenvals_reduced_stabMatrix:
-                if printlab:
-                    plt.plot(eigval.real, eigval.imag, 'r+', label='Eigenvalues of reduced Matrix')
-                    printlab = False
-                else:
-                    plt.plot(eigval.real, eigval.imag, 'r+', label='_nolegend_')
-
-            if eigenvals_reduced_stabMatrix.size > 0:
-                plt.legend()
-            fig.savefig('circles/' + str(round(t * 100)) + 'gersh.png')
-            del stabTensor, stabMatrix, reduced_stabMatrix, eigenvals_reduced_stabMatrix
-            plt.close(fig)
+            Gtens = assemble(-1 * G)
+            G_vec = np.array(Gtens.array())
+            G_backflow = G_vec * (backflow_vec != 0)
+            G_backflow_Nozero = G_backflow[~(G_backflow == 0).all(1)]
+            reduced_G = np.transpose(
+                G_backflow_Nozero.transpose()[~(G_backflow_Nozero.transpose() == 0).all(1)])
+            eigvec = reduced_G
+            #     # values, vects = LA.eig(reduced_stabMatrix)
+            #     # eigvec = vects[:, np.argmin(values)]
+            # if plotcircles == 2 and eigenvals_reduced_stabMatrix.size > 0:
+            #     stabMatrix_sparse = sp.sparse.bsr_matrix(stabMatrix)  # Sparse Version
+            #     # print(stabMatrix_sparse)
+            #     small_eigenvals_stabMatrix = ssl.eigs(stabMatrix_sparse, 5, sigma=-5, which='LM', return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
+            #     # if t > 0.245 and t < 0.255:
+            #     #     stabMatrix_mineig = ssl.eigs(stabMatrix_sparse, 1, sigma=-5, which='LM',
+            #     #                                  return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
+            #     #     stabMatrix_maxeig = ssl.eigs(stabMatrix_sparse, 1, which='LM', return_eigenvectors=False,
+            #     #                                  v0=np.ones(stabMatrix_sparse.shape[0]))
+            #     #     eigvec = np.array([stabMatrix_mineig, stabMatrix_maxeig])
+            #     printlab = True
+            #     for EV in small_eigenvals_stabMatrix:
+            #         if printlab:
+            #             plt.plot(EV.real, EV.imag, 'ko', label='Eigenvalues of full Matrix')
+            #             printlab = False
+            #         else:
+            #             plt.plot(EV.real, EV.imag, 'ko', label='_nolegend_')
+            #     print(small_eigenvals_stabMatrix.min().real)
+            #     del stabMatrix_sparse, small_eigenvals_stabMatrix
+            # printlab = True
+            # for eigval in eigenvals_reduced_stabMatrix:
+            #     if printlab:
+            #         plt.plot(eigval.real, eigval.imag, 'r+', label='Eigenvalues of reduced Matrix')
+            #         printlab = False
+            #     else:
+            #         plt.plot(eigval.real, eigval.imag, 'r+', label='_nolegend_')
+            #
+            # if eigenvals_reduced_stabMatrix.size > 0:
+            #     plt.legend()
+            # fig.savefig('circles/' + str(round(t * 100)) + 'gersh.png')
+            # del stabTensor, stabMatrix, reduced_stabMatrix, eigenvals_reduced_stabMatrix
+            # plt.close(fig)
             # print(round(assemble(beta * ds(2)), 5))
 
         # print("stabilisationTest matrix is: " + HF.diag_dom(stabMatrix))
@@ -426,27 +512,36 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 if __name__ == '__main__':
     Re = [5000]
 
-    gammaVec = 10**np.arange(3.)
-
+    gammaVec = [10]#,20,30,40,50,60,70,80,90,100]#np.arange(1, 4, 1)#np.array([1, 25, 50])#10**np.arange(3.)#
+    # betaVec = np.arange(0.05, 1+0.05, 0.05)#[1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1]
     eigsarr = []
     for Re_ in Re:
         for gamma in gammaVec:
-            eigsarr.append(nse(Re_, level=1, temam=True, bfs=3, velocity_degree=1, eps=0.0001, dt=0.01, auto=False, plotcircles=2, gammagiv=gamma))
+            print(gamma)
+            eigsarr.append(nse(Re_, level=1, temam=True, bfs=3, velocity_degree=1, eps=0.0001, dt=0.01, auto=False, plotcircles=1, gammagiv=gamma))
 
-    fig = plt.figure(1)
-    idx = 0
 
-    #Need to add code to make the plot below work correctly
-    for gamma in gammaVec:
-        curreigsvec = eigsarr[idx]
-        plt.figure(1)
-        if idx == 0:
-            plt.plot(gamma, abs(curreigsvec[0].real - curreigsvec[1].real), 'ro', label="abs(maxeig - mineig)")
-        else:
-            plt.plot(gamma, abs(curreigsvec[0].real - curreigsvec[1].real), 'ro', label='_nolegend_')
-        idx += 1
-    plt.legend()
-    plt.show()
+
+    # eigsarrV = np.resize(eigsarr, [len(gammaVec), 12]).real
+    #
+    # import pandas as pd
+    #
+    # EVcsv = pd.DataFrame(eigsarrV)
+    # EVcsv.to_csv('eigVec_10_thru_100' + '.csv', index=True)
+    # mineigsP = eigsarrV[:, 0].real
+    # maxeigsP = eigsarrV[:, 1].real
+    # figP = plt.figure()
+    # plt.plot(betaVec, mineigsP, '^--', c='coral')
+    # plt.plot(betaVec, maxeigsP, '+--', c='lime')
+    # plt.plot(betaVec, np.abs(mineigsP - maxeigsP), 'o--', c='aqua')
+    # plt.legend(["Minimum Eigenvalue", "Maximum Eigenvalue", "abs(Max - Min) Eigenvalue"])
+    # # plt.title("Eigenvalue change for gamma = 1,2,3 with stab-method = Tang(2016)")
+    # plt.title("Eigenvalue change for beta = 0.1 - 1.0 with stab-method = Velo")
+    # plt.xlabel("beta")
+    # # plt.ylabel("")
+    # plt.show()
+    # figP.savefig('compare/' + 'Beta_1_thru_0_velo' + '.png')
+
 
         ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
 

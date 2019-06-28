@@ -19,7 +19,7 @@ def abs_n(x):
 
 def maxUneg(W,mesh,u0):
     coords  =   mesh.coordinates()
-    eps     =   1e-5
+    # eps     =   1e-5
     eps     =   0.033
     #eps     =   mesh.hmin()
     # This is need to have done in order to extract the x component of u0 

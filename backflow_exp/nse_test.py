@@ -109,10 +109,10 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
         
         maxiv = HF.maxUneg(W,mesh,u0)
-        print("maxBFVelo is: {}".format(maxiv))
+        # print("maxBFVelo is: {}".format(maxiv))
         maxi = Constant(maxiv)
         
-        G = -1 * gamma * abs(maxi) * 0.5 * rho * Ctgt * (Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
+        G = -1 * gamma * maxi * 0.5 * rho * Ctgt * (Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
         F -= G
     elif velocity_degree == 1 and float(eps):
         F += eps / mu * h ** 2 * inner(grad(p_), grad(q)) * dx
@@ -375,16 +375,15 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
             laplace_backflow_final = np.transpose(laplace_backflow.transpose()[~(laplace_backflow.transpose() == 0).all(1)])
             
             eigenvals = []
-            
-<<<<<<< HEAD
+
             maxi.assign(HF.maxUneg(W,mesh,u0))
             print("new maxi is: {}".format(float(maxi)))
             #maxi.assign(Constant(maxiv))
-=======
+
             maxiv   =   HF.maxUneg(W,mesh,u0)
-            print(maxiv)
+            # print(maxiv)
             maxi.assign(Constant(maxiv))
->>>>>>> 5f461d369ef238743a03dd5f59ca78db89e7b635
+
             
             if len(laplace_backflow_final)>0:
                 eigenvals = LA.eigvals(laplace_backflow_final)
