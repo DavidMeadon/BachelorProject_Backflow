@@ -14,21 +14,28 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \setlength{\headheight}{14.5pt}
-\fancyhead{}
-\fancyhead[RO,LE]{Thesis Title}
-\fancyhead[RE,LO]{\rightmark}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\fancyhf{}
+\fancyhead[RO,LE]{\leftmark}
+% \fancyhead[RO,LE]{Chapter \thechapter}
+% \fancyhead{}
+% \fancyhead[RO,LE]{Automation of Backflow Stabilisation Parameters}
+% \fancyhead[RO,LE]{Chapter \thechapter: }
+% \fancyhead[RE,LO]{\leftmark}
 \fancyfoot{}
-\fancyfoot[LE,RO]{\thepage}
-\fancyfoot[CE,CO]{Chapter \thechapter}
+\fancyfoot[CE,CO]{\thepage}
+% \fancyfoot[CE,CO]{Chapter \thechapter}
 % \fancyfoot[CO,RE]{Author Name}
 
 %% Math
-\usepackage{amsmath} %
+\usepackage{amsmath} 
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{mathtools}
 \usepackage{mathpazo}
 \usepackage{physics}
+\usepackage{dsfont} %% Nice double stroke letters like R for real numbers
+% \usepackage{siunitx} %%Adding SI units
 
 %% Graphics
 \usepackage{graphicx}
@@ -37,10 +44,17 @@
 
 %% Figures
 \usepackage{subcaption}
-\usepackage{wrapfig}
-\usepackage{float}
+% \usepackage{wrapfig}
+% \usepackage{float}
 \usepackage{caption}
 
+%% Tables
+% \usepackage{csvsimple}
+% \usepackage{multicol}
+% \usepackage{multirow}
+
+%% Adding boxes around text
+% \usepackage{fancybox, calc}
 
 %% Format
 \usepackage[colorinlistoftodos]{todonotes}
@@ -50,12 +64,24 @@
 \usepackage[backend=biber,style=ieee,url=true,doi=true,dashed=false,sorting=nyt]{biblatex}
 \addbibresource{citations.bib}
 \usepackage{comment}
+\usepackage{bookmark} %For correct pdf bookmarks
 
 %% For Title Page
 \usepackage{pdfpages}
 
+%% For Code
+% \usepackage{listings}
+% \usepackage{minted}
 
-% %%%%%%--FOR ABS AND NORM--%%%%%%
+%% Temp Text
+% \usepackage{lipsum}
+
+%% For algorithms
+\usepackage[boxed]{algorithm2e}
+
+
+% %%%%%%%%%%%%--FOR ABS AND NORM--%%%%%%%%%%%%
+%% Not needed when using physics package
 % \DeclarePairedDelimiter\abs{\lvert}{\rvert}
 % \DeclarePairedDelimiter\norm{\lVert}{\rVert}
 
@@ -66,14 +92,55 @@
 % \let\oldnorm\norm
 % \def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
 % \makeatother
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%--MINI MATH MODE--%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%--OWN COMMANDS--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%For Criterion Environment
+\theoremstyle{plain}
+\newtheorem*{criterion}{Stability Criterion}
+
+%% Mini Mathmode
 \newcommand{\mathm}[1]{\(#1\)}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%--This is for simpler integrals--%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage{xparse}
+%% For Bold text u, v, n
+\newcommand{\bmu}{{\textbf{u}}}
+\newcommand{\bmv}{{\textbf{v}}}
+\newcommand{\bmn}{{\textbf{n}}}
+
+%% For domain(f) and boundary(b) integrals 
+\newcommand{\bint}{\int\limits_{\Gamma_{N}}}
+\newcommand{\fint}{\int\limits_{\Omega}}
+
+%% For making own chapters without numbering
+%% in the table of contents while still
+%% correct section numbering
+\newcommand{\mychapter}[2]{
+    \markboth{#2}{}
+    \setcounter{chapter}{#1}
+    \setcounter{section}{0}
+    \chapter*{#2}
+    \addcontentsline{toc}{chapter}{#2}}
+    
+%% Creates an "order of" symbol
+\DeclareRobustCommand{\orderof}{\ensuremath{\mathcal{O}}}
+
+%% For inline math beta and gamma
+\newcommand{\mbeta}{\(\beta\)}
+\newcommand{\mgamma}{\(\gamma\)}
+
+%% For inner products
+\newcommand{\inner}[2]{\big(#1,#2\big)}
+
+%% For stress tensor
+\newcommand{\stresstens}{\bm{\varepsilon}(\bmu)}
+
+
+%% This is for simpler integrals
+
+% \usepackage{xparse}
 
 % \newcommand\dd{\mathrm{d}}
 
@@ -137,24 +204,14 @@
 % %%      Can be used as \Int[0,T;0,a]{f^2}[t;x]    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\usepackage{csvsimple}
-\usepackage{multicol}
-\usepackage{multirow} 
-\usepackage{fancybox, calc}
-\usepackage{listings}
-\usepackage{siunitx}
 
 
 
-
-
-
-
-
-\newcommand{\mychapter}[2]{
-    \setcounter{chapter}{#1}
-    \setcounter{section}{0}
-    \chapter*{#2}
-    \addcontentsline{toc}{chapter}{#2}}
-
-\usepackage{lipsum}
+% \addto\extrasngerman{%
+%   \def\figureautorefname{\textit{Bild}} %
+%   \def\tableautorefname{\textit{Tabelle}}%
+%   \def\subsectionautorefname{Unterkapitel}%
+%   \def\sectionautorefname{Kapitel}%
+%   \def\subsubsectionautorefname{Abschnitt}%
+%   \def\equationautorefname{\textit{Gleichung}}%
+% }

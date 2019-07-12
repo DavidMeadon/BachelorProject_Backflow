@@ -2,28 +2,40 @@
 \input{preamble.tex}
 
 
-% \includeonly{Sections/Introduction}
+% \includeonly{Sections/part2}
 
 \begin{document}
-\includepdf{Thesis_Frontpage.pdf}
-% \maketitle
+\includepdf{ThesisFrontpage.pdf}
+
+\shipout\null
+
 \begin{abstract}
     \input{Sections/Abstract.tex}
 \end{abstract}
 
+\shipout\null
 
 \tableofcontents
 
+\listoffigures
+
 \include{Sections/Introduction}
+
+\include{Sections/Background}
 
 \include{Sections/part2}
 
 \include{Sections/part3}
 
+\include{Sections/part4}
+
 \include{Sections/conclusion}
 
-\include{Sections/ffinal}
 
-\printbibliography
+\printbibliography[
+heading=bibintoc,
+title={Bibliography}
+]
+% \printbibliography
 \end{document}
 

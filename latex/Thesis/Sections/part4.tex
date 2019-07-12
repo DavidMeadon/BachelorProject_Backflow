@@ -1,0 +1,59 @@
+\mychapter{5}{Parameter Automation}
+
+--This section still needs some more results--
+
+\section{Algorithms}
+
+Now that there is a criterion to check, and a simplification to the problem, we can create the algorithm which will be automating the parameter selection. We will consider each different stabilisation method individually, and create a specific stabilisation method for that method.
+
+\subsection{Velocity Penalisation}
+
+For this stabilisation method there is a guaranteed stable value, so we can start at that value and then decrease our parameter until we violate the stability criterion, and thus we are able to maintain stability while trying to lower the impact on accuracy as much as possible. The problem as we observed previously is that by simply looking at \mathm{-B+S}, the only stable value for \mbeta~is for \mathm{\beta = 1}, which would then not actually be automating. To be able to safely lower the value of \mbeta, other stabilising terms would need to be considered.
+
+\subsection{Tangential Penalisation Max}
+
+The Algorithm for this method is slightly different because there is no guaranteed stable value for its parameter that can easily be computed. However we do know that if \mgamma~is taken to be big enough then we will attain stability. Thus we can begin the automation at some user given input and then determine if the this is a stable value for \mgamma. If it is stable then attempt to reduce it until instability is detected and then save the previously found \mgamma~value as the current best one to use, while if the user given input is not stable then increase the value of the parameter until stability is reached. This would then be repeated at every time step with the previously found \mgamma~value being used as the initial value for all time steps after the first one as this would reduce the number of computations rather than always beginning at some fixed value at every time step. In algorithmic form:
+
+% \begin{algorithm}[H]
+% \SetAlgoLined
+% \KwResult{Write here the result }
+%  initialization\;
+%  \While{While condition}{
+%   instructions\;
+%   \eIf{condition}{
+%   instructions1\;
+%   instructions2\;
+%   }{
+%   instructions3\;
+%   }
+%  }
+%  \caption{Automated Parameter Stabilisation for the Tangential Penalisation Max method}
+% \end{algorithm}
+
+% \begin{algorithm}[H]
+% \SetAlgoLined
+%  \eIf{first time-step}{
+%   initial guess = user input
+%   }{
+%   initial guess = \mathm{\gamma_{prev}}
+%   }
+%  \While{True}{
+%     \If{No Backflow}{
+%         \mathm{\gamma_{next}} = initial guess\;
+%         break\;}
+%     \mathm{\gamma_{candidate}} = initial guess\;
+%     test if criterion attained\;
+%   \eIf{criterion attained}{
+%   \;
+%   instructions2\;
+%   }{
+%   instructions3\;
+%   }
+%  }
+%  \caption{Automated Parameter Stabilisation for the Tangential Penalisation Max method}
+% \end{algorithm}
+
+
+\subsection{Tangential Penalisation}
+
+The Algorithm for this method would probably be quite similar to the previous method however, we ran into the problem in the previous section where there is no value for \mgamma~such that stability is achieved by only considering \mathm{- B + S}, thus we would need to consider other term, or other options to stabilise the single eigenvalue which will not become positive.

@@ -1,44 +1,95 @@
 % \mychapter{2}{Automating the parameter}
-\chapter{Automating the parameter} %Chapter title needs work
+\mychapter{3}{Automation Prerequisits} %Chapter title needs work
 
-
-The first step we will take in automating the stabilising parameters will be to look at exactly what makes the problem stable, i.e. why does The main criterion for stability that we will be using is that we want the full backflow terms (backflow + stabilising) to have positive eigenvalues in their discretised form. 
+The first steps that will be taken in order to understand how the parameters could be automated will be to obtain some tools which will be used when we would want to automate the parameter selection. Understanding exactly how stability can be achieved by using the stabilisations is exceptionally important for the automation so we will first try to find some stability criterion that can be checked during the parameter selection. Following that we will offer an insight that will reduce the computational cost of checking this criterion such that is becomes feasible. Thus we can now begin with an in-depth look into how a stability criterion can be found.
 
 \section{Stability criterion}
 
-In order to automate the parameters used in the stabilisation process, we first need some stability criterion that we can check and use to ensure that the parameter we are using is indeed guaranteeing stability. To find this criterion we first consider the change of energy of the system. We require the that the energy of the system not increase... and thus we would like in the discretised form that the problem is positive definite.
+% The weak form of the NS equations (\ref{NSeq}) can be written as:
+% \begin{align}\label{NSweak}
+%     \rho\qty(\bmu_{t}, \bmv) + \mu\qty(\nabla \bmu, \nabla \bmv) + \rho\qty(\bmu \cdot \nabla \bmu, \bmv) + \rho\qty(\bm{p}, \nabla \cdot \bmv) = (\bm{f}, \bmv)
+% \end{align}
 
-\section{Stabilisation}
+% where:
+% \[
+%     (\bm{x},\bm{y}) = \fint \bm{x} \cdot \bm{v}
+% \]
+% The two middle terms of \ref{NSweak} can be rewritten as follows:
+% % \begin{align}\label{NSeq}\begin{split}
 
-As mentioned during the introduction there are two types of stabilisation we will be considering:
+% %  \rho\partial_t\textbf{u} + \rho(\textbf{u} - \textbf{w})\cdot\nabla\textbf{u} - 2\mu\nabla\cdot\epsilon(\textbf{u}) + \nabla p &= 0 \\ \nabla\cdot\textbf{u} &= 0 
+% %  \end{split}\end{align}
+% \[\begin{aligned}\label{BFpart}
+%     \mu\qty(\nabla \bmu, \nabla \bmv) + \rho\qty(\bmu \cdot \nabla \bmu, \bmv) &= \mu\qty(\nabla \bmu, \nabla \bmv) + \frac{\rho}{2}\bint \abs{\bmu \cdot \bm{n}}_- \bmu \cdot \bmv \\ &- \frac{\rho}{2}\bint \abs{\bmu \cdot \bm{n}}_- \bmu \cdot \bmv + \rho\qty(\bmu \cdot \nabla \bmu, \bmv)
+% \end{aligned}\]
+% where we added and subtracted the problematic backflow term. 
+% The formula that we want to consider for stabilisation is:
+% \[
+% \mu \bint \nabla \bmu \cdot \nabla \bmv - \frac{\rho}{2}\bint \abs{\bmu \cdot \bm{n}}_- \bmu \cdot \bmv ~+ ~S
+% \]
+% where S is one of the stabilisation methods, i.e.
+% \[
+% S = \begin{cases}\displaystyle
+%         \gamma h^2 \frac{\rho}{2} \int\limits_{\Gamma_N} \abs{\bmu \cdot \bm{n}}_- \qty(t^{T}\nabla\bmu \cdot t^{T}\nabla\bmv )\\[20pt]
+%         \displaystyle \beta\frac{\rho}{2}\int\limits_{\Gamma_N} \abs{\bmu \cdot \bm{n}}_- \bmu \cdot \bmv
+%     \end{cases}
+% \]
+In order to automate the parameters used in the stabilisation process, we first need some stability criterion that we can check and use to ensure that the parameter we are using is indeed guaranteeing stability. To find this criterion we first consider the change of energy of the system. We require the that the energy of the system does not increase and to this end consider \autoref{NSeqENergy}, which is the change in energy over time of the system, and for stability we would like this to be negative, i.e. we want it to be dissipative. This is clearly a problem in the presence of backflow where it may become positive thus causing an instability. To see this more clearly, we use that any real-valued function can be split into a negative and positive part: \( f = \abs{f}_+ - \abs{f}_-\) where \( \abs{f}_+ = \frac{\abs{f} + f}{2}\) and \( \abs{f}_- = \frac{\abs{f} - f}{2}\). Thus \autoref{NSeqENergy} can be rewritten as:
+
+%  and thus we would like in the discretised form that the problem is positive definite. We require the eigenvalues in the direction of the solution to be positive. We do not know though what the direction of the solution is before we have found the solution, so a sufficient condition is to make all the eigenvalues positive.
+\[
+\begin{aligned}
+   \partial_t\frac{\rho}{2}\fint\norm{\bmu}^2 &= -2\mu\fint\norm{\varepsilon(\bmu)}^2 - \frac{\rho}{2}\bint\bmu\cdot\bmn\norm{\bmu}^2\\
+                                              &= -\qty(2\mu\fint\norm{\varepsilon(\bmu)}^2 + \frac{\rho}{2}\bint\bmu\cdot\bmn\norm{\bmu}^2)\\
+                                              &= -\qty(2\mu\fint\norm{\varepsilon(\bmu)}^2 + \frac{\rho}{2}\bint\abs{\bmu\cdot\bmn}_+\norm{\bmu}^2 - \frac{\rho}{2}\bint\abs{\bmu\cdot\bmn}_-\norm{\bmu}^2)
+\end{aligned}
+\]
+where now, we could like the term between brackets:
+\begin{equation}\label{eq:stabfunc}
+    2\mu\fint\norm{\varepsilon(\bmu)}^2 + \frac{\rho}{2}\bint\abs{\bmu\cdot\bmn}_+\norm{\bmu}^2 - \frac{\rho}{2}\bint\abs{\bmu\cdot\bmn}_-\norm{\bmu}^2
+\end{equation}
+to be positive. This is obviously not true always because of the last term in \autoref{eq:stabfunc} which is exactly the term that will become non-zero in the presence of backflow. Furthermore from hereon we will denote:
+\begin{equation}\label{eq:backflow}
+    B := \frac{\rho}{2}\bint\abs{\bmu\cdot\bmn}_- \bmu \cdot \bmv
+\end{equation} as the backflow term since it will be equal to the last term in \autoref{eq:stabfunc} when testing with the true solution, \mathm{\bmu}. So we now have the beginning of our stability criterion, that we require  \autoref{eq:stabfunc} to be positive. As this is not true in general, we need to add one of the before mentioned stabilising terms to ensure positivity: 
+\begin{equation}\label{eq:stabfunc2}
+    2\mu\fint\norm{\varepsilon(\bmu)}^2 + \frac{\rho}{2}\bint\abs{\bmu\cdot\bmn}_+\norm{\bmu}^2 - \frac{\rho}{2}\bint\abs{\bmu\cdot\bmn}_-\norm{\bmu}^2 + S
+\end{equation}
+where as before the considered stabilisation methods are:
 \begin{itemize}
     \item Velocity Penalisation:
-    \[
-    S = \beta\frac{\rho}{2}\int_{\Gamma_N} \abs{\bm{u} \cdot \bm{n} }_- \bm{u} \cdot \bm{v}
-    \]
+    \begin{equation}\label{eq:stabVeloPen}
+        S = \beta\frac{\rho}{2}\bint \abs{\bmu \cdot \bmn }_- \bmu \cdot \bmv
+    \end{equation}
     where beta is the stabilisation parameter.
     \item Tangential Derivative Penalisation:
-    \[
-    S = \gamma\frac{\rho}{2}h^{2}\int_{\Gamma_N} \abs{\bm{u} \cdot \bm{n} }_- \qty(t^{T}\nabla\bm{u} \cdot t^{T}\nabla\bm{v})
-    \]
-    where gamma is the stabilisation parameter and \mathm{t} are the tangential directions
+
+\begin{align}
+        S &= \gamma\frac{\rho}{2}h^{2}\bint \abs{\bmu \cdot \bmn }_- \qty(t^{T}\nabla\bmu \cdot t^{T}\nabla\bmv)\label{eq:stabTangPen}\\
+        S &= \gamma U_b h^2 \frac{\rho}{2} \bint \qty(t^{T}\nabla\bmu \cdot t^{T}\nabla\bmv),  ~~U_b = \max \abs{\bmu \cdot \bmn}_-\label{eq:stabTangPenMax}
+\end{align}
+    where gamma is the stabilisation parameter and \mathm{t} are the tangential directions. We will denote \autoref{eq:stabTangPen} as the Tangential Penalisation method and \autoref{eq:stabTangPenMax} as the Tangential Penalisation Max method.
 \end{itemize}
 
-There are some important formula which we will continually use and refer to so for convenience they are listed here for ease of reference:
-\begin{itemize}
-    \item Backflow term:\\
-    \[
-    B = \frac{\rho}{2}\int_{\Gamma_N} \abs{\bm{u} \cdot \bm{n} }_- \norm{\bm{u}}^2
-    \]
-    \item Stabilisation test
-    \[
-    T = -B + S
-    \]
-\end{itemize}
+% \[
+% S = \begin{cases}\displaystyle
+%         \gamma h^2 \frac{\rho}{2} \int\limits_{\Gamma_N} \abs{\bmu \cdot \bm{n}}_- \qty(t^{T}\nabla\bmu \cdot t^{T}\nabla\bmv )\\[20pt]
+%         \displaystyle \beta\frac{\rho}{2}\int\limits_{\Gamma_N} \abs{\bmu \cdot \bm{n}}_- \bmu \cdot \bmv
+%     \end{cases}
+% \]
+
+For stability, we only need to test diagonally, i.e. the case (\bmv~= \bmu), and so the condition we would like to check is if the eigenvalues in the direction of the solution, \bmu, of the discretisation of \autoref{eq:stabfunc2} are positive. Here we will take a conservative view and require this condition only for \mathm{- B + S}. It is in general not feasible to look at the eigenvalues in the direction of the solution because we will not know the solution before we compute it, so a sufficient condition will be to ensure that all the eigenvalues are positive. This now is the stability criterion which we will use to ascertain whether the stabilisation method is indeed stabilising the backflow term, and which will be checked during the automation procedure:
+\theoremstyle{definition}
+\begin{criterion}
+The numerical simulation will not suffer from backflow instabilities if the eigenvalues of the discretisation of \mathm{- B + S} are non-negative.
+\end{criterion}
+For a general problem however, this criterion would be hard to check as the size of the discretised matrix will be exceptionally large, and thus we would have to calculate many eigenvalues, at every time-step in order to set the value for the parameter. We can however cheapen this significantly by using certain properties of the matrix.
 
 
 \section{Reduction of eigenvalue problem}
 
-Finding the eigenvalues of the entire backflow terms matrix will in general be exceptionally expensive due to the size of the matrix, however we can reduce the problem by first noting that the discretisation of the bad backflow term will be zero everywhere except where backflow occurs, namely where the problems occur. So we can therefore reduce the problem to only considering the sub-matrix where the backflow actually occurs. We do this by first considering the discretised form of the backflow term\includecomment{refer here to relevant to equation} who's matrix will be zero almost everywhere except for small sub-matrices where there is actually backflow. We then transform this matrix into one of zeros and ones, where it is zero if there is no backflow and 1 if there is backflow. Finally we then element-wise multiply this matrix with the stabilisation test matrix. We then extract the sub-matrices from this which are the nonzero square matrices where there is backflow. Finally these will be the reduced matrices over which we can calculate eigenvalues and use to automatically stabilise. An additional benefit of this procedure is that it allows us to stabilise different backflow regions with different parameters depending on the amount of backflow there, rather than the current regime where the entire system uses the same parameter irrespective of the amount of backflow.
+Finding the eigenvalues of the entire backflow term's matrix will in general be exceptionally expensive due to the size of the matrix, however we can reduce the problem by first noting that the discretisation of the backflow term, \mathm{B}, will be zero everywhere except where backflow occurs, namely where the instability problems occur. So we can therefore reduce the problem to only considering the sub-matrices where the backflow actually occurs.\\
+\\
+\todo[inline]{Add the following rather to an algorithm}
+We do this by first considering the discretised form of \mathm{B} who's matrix will be zero almost everywhere except for small sub-matrices where there is actually backflow. We then transform this matrix into one of zeros and ones, where it is zero if there is no backflow and 1 if there is backflow. Finally we then element-wise multiply this matrix with the stabilisation test matrix, \mathm{- B + S}. We then extract the sub-matrices from this which are the nonzero square matrices where there is backflow. Finally these will be the reduced matrices over which we can calculate eigenvalues and use to automatically stabilise. An additional benefit of this procedure is that it allows us to stabilise different backflow regions with different parameters depending on the amount of backflow there, rather than the current regime where the entire system uses the same parameter irrespective of the amount of backflow. Now that a stability criterion has been found, as well as a reduction in the problem of checking whether this criterion has been attained, we should now verify whether this criterion actually ensures the stability that we expect.
 
-\section{Algorithms}
