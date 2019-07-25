@@ -1,18 +1,50 @@
 \mychapter{5}{Parameter Automation}
 
---This section still needs some more results--
 
 \section{Algorithms}
 
-Now that there is a criterion to check, and a simplification to the problem, we can create the algorithm which will be automating the parameter selection. We will consider each different stabilisation method individually, and create a specific stabilisation method for that method.
-
-\subsection{Velocity Penalisation}
-
-For this stabilisation method there is a guaranteed stable value, so we can start at that value and then decrease our parameter until we violate the stability criterion, and thus we are able to maintain stability while trying to lower the impact on accuracy as much as possible. The problem as we observed previously is that by simply looking at \mathm{-B+S}, the only stable value for \mbeta~is for \mathm{\beta = 1}, which would then not actually be automating. To be able to safely lower the value of \mbeta, other stabilising terms would need to be considered.
+Using the previous results, the stability criterion and the simplification to the eigenvalue problem, algorithms can now be created which will automate the parameter selection.\\
+\\
+The results did show however that for two of the considered methods, Velocity Penalisation and Tangential Penalisation, the methods were unable to attain the desired stability criterion on their own, so with the current tools used in this paper it is not possible to automate them. The Velocity Penalisation method has a value for its parameter which guarantees stability so it could still be safely usable. The Tangential Penalisation method however does not have that benefit and requires more research into how it can be safely implemented so as to remove the danger of backflow instabilities not being fully stabilised by it. The Tangential Penalisation Max method did however show very promising results and as such will be be discussed here and following that an algorithm for the reduction of the eigenvalue problem discussed in the Automation Prerequisites chapter will be outlined.
 
 \subsection{Tangential Penalisation Max}
 
-The Algorithm for this method is slightly different because there is no guaranteed stable value for its parameter that can easily be computed. However we do know that if \mgamma~is taken to be big enough then we will attain stability. Thus we can begin the automation at some user given input and then determine if the this is a stable value for \mgamma. If it is stable then attempt to reduce it until instability is detected and then save the previously found \mgamma~value as the current best one to use, while if the user given input is not stable then increase the value of the parameter until stability is reached. This would then be repeated at every time step with the previously found \mgamma~value being used as the initial value for all time steps after the first one as this would reduce the number of computations rather than always beginning at some fixed value at every time step. In algorithmic form:
+The results in the previous section for this method agreed with the theoretical finding that if \mgamma~is taken big enough then stability will be attained. Ideally for this method, the parameter would start at the guaranteed stable value when backflow is detected and then proceed from there, however that greatly depends on the geometry of the simulation as the Poincar\'e Constant is non-trivial to calculate in general. Thus it will be suggested that a first value is a user-given one, however it is recommended that if possible, the initial value is the guaranteed stable value. The algorithm is thus outlined in \autoref{algo:TangMax}.
+
+\begin{algorithm}[t]
+\SetAlgoLined
+
+\KwResult{Find \mathm{\gamma_{Next}}, the stable parameter value}
+
+ \eIf{First time-step}{
+ initial guess = user input\;
+ }{
+ initial guess = \mathm{\gamma_{prev}}\;
+ }
+ \mathm{\gamma_{candidate}} = initial guess\;
+ Stability Found = false\;
+ \While{True}{
+ \If{No Backflow}{
+    \mathm{\gamma_{next}} = \mathm{\gamma_{candidate}}\;
+    break\;
+ }
+  Test if criterion attained\;
+  \uIf{Criterion Attained}{
+  \mathm{\gamma_{candidate}} = reduced \mathm{\gamma_{candidate}}\;
+  Stability Found = true\;
+  }
+  \uElseIf{Criterion Failed and Stability Found == false}{
+  \mathm{\gamma_{candidate}} = increased \mathm{\gamma_{candidate}}\;
+  }
+  \Else{
+  \mathm{\gamma_{next}} = \mathm{\gamma_{previous}}\;
+  break\;
+  }
+ }
+ \caption{Tangential Penalisation Max}
+ \label{algo:TangMax}
+\end{algorithm}
+% The Algorithm for this method is slightly different because there is no guaranteed stable value for its parameter that can easily be computed. However we do know that if . Thus we can begin the automation at some user given input and then determine if the this is a stable value for \mgamma. If it is stable then attempt to reduce it until instability is detected and then save the previously found \mgamma~value as the current best one to use, while if the user given input is not stable then increase the value of the parameter until stability is reached. This would then be repeated at every time step with the previously found \mgamma~value being used as the initial value for all time steps after the first one as this would reduce the number of computations rather than always beginning at some fixed value at every time step. In algorithmic form:
 
 % \begin{algorithm}[H]
 % \SetAlgoLined
@@ -30,30 +62,6 @@ The Algorithm for this method is slightly different because there is no guarante
 %  \caption{Automated Parameter Stabilisation for the Tangential Penalisation Max method}
 % \end{algorithm}
 
-% \begin{algorithm}[H]
-% \SetAlgoLined
-%  \eIf{first time-step}{
-%   initial guess = user input
-%   }{
-%   initial guess = \mathm{\gamma_{prev}}
-%   }
-%  \While{True}{
-%     \If{No Backflow}{
-%         \mathm{\gamma_{next}} = initial guess\;
-%         break\;}
-%     \mathm{\gamma_{candidate}} = initial guess\;
-%     test if criterion attained\;
-%   \eIf{criterion attained}{
-%   \;
-%   instructions2\;
-%   }{
-%   instructions3\;
-%   }
-%  }
-%  \caption{Automated Parameter Stabilisation for the Tangential Penalisation Max method}
-% \end{algorithm}
+\subsection{Eigenvalue problem reduction}
 
-
-\subsection{Tangential Penalisation}
-
-The Algorithm for this method would probably be quite similar to the previous method however, we ran into the problem in the previous section where there is no value for \mgamma~such that stability is achieved by only considering \mathm{- B + S}, thus we would need to consider other term, or other options to stabilise the single eigenvalue which will not become positive.
+In order to reduce the computational complexity of finding the eigenvalues necessary for checking the stability criterion, the matrix can be reduced. This is done by first considering \mathm{M_{backflow}}, the discretised form of \eqref{eq:backflow} which will be zero almost everywhere except for small sub-matrices where there is actually backflow. \mathm{M_{backflow}} is then normalised into a matrix of zeros and ones, where it is zero if there is no backflow and 1 if there is backflow, denote this matrix \mathm{M_{backflow}^{1\&0's}}. Finally \mathm{M_{backflow}^{1\&0's}} is element-wise multiplied with \mathm{M_{stab}}, the discretisation of \mathm{- B + S} and yields \mathm{M_{stab}^{reduced}}. We then extract the sub-matrices from \mathm{M_{stab}^{reduced}} which are the nonzero square matrices where there is backflow. Finally these will be the reduced matrices over which we can calculate eigenvalues and use to automatically stabilise. An additional benefit of this procedure is that it allows us to stabilise different backflow regions with different parameters depending on the amount of backflow there, rather than the current regime where the entire system uses the same parameter irrespective of the amount of backflow.

@@ -1,0 +1,52 @@
+\section{Automation Prerequisites}
+
+ \subsection{What are we investigating?}
+    \begin{frame} {What are we investigating}
+        
+        \begin{block}{What is needed for automating the parameters?}
+        \begin{itemize}
+            \item A criterion to be met
+            \item A way to test and attain that criterion
+        \end{itemize}
+        \end{block}
+    \end{frame}
+  
+    \subsection{Stability Criterion}
+    \begin{frame}{What do we want from the system}
+        Would like the system to be dissipative.\\
+        Change in energy:
+        \[\footnotesize
+\begin{aligned}
+   \partial_t\frac{\rho}{2}\fint\norm{\bmu}^2 &= -2\mu\fint\norm{\varepsilon(\bmu)}^2 - \frac{\rho}{2}\bint\bmu\cdot\bmn\norm{\bmu}^2\\
+                                              &= -\qty(2\mu\fint\norm{\varepsilon(\bmu)}^2 + \frac{\rho}{2}\bint\bmu\cdot\bmn\norm{\bmu}^2)\\
+                                              &= -\qty(2\mu\fint\norm{\varepsilon(\bmu)}^2 + \frac{\rho}{2}\bint\abs{\bmu\cdot\bmn}_+\norm{\bmu}^2 - \frac{\rho}{2}\bint\abs{\bmu\cdot\bmn}_-\norm{\bmu}^2)
+\end{aligned}
+\]
+    \end{frame}
+    
+    \begin{frame}{Backflow interaction}
+
+Want the term \(B := \frac{\rho}{2}\bint\abs{\bmu\cdot\bmn}_- \bmu \cdot \bmv\) to be stabilised, so that when we test with \(\bmv = \bmu\), we get that the energy decreases, i.e. dissipation.\\
+We thus need to add one of the stabilisations, and look at \(-B+S\).
+    \end{frame}
+    
+    \begin{frame}{Stability Criterion}
+    We take a very conservative approach and look only at the added stability terms to counter the instability
+        \begin{block}{Stability Criterion}
+            For stability, we require that the eigenvalues of \(-B+S\) in discretised form are non-negative
+        \end{block}
+    \end{frame}
+    \subsection{Reduction of Eigenvalue Problem}
+    \begin{frame}{Checking the stability criterion}
+    \begin{block}{What are the problems with checking the criterion?}
+        Computationally Expensive - may have to calculate the eigenvalues of a few thousand by few thousand matrix at every iteration
+    \end{block}
+    Idea: Don't have to consider the entire matrix
+    \end{frame}
+    \begin{frame}{Creating submatrix}
+        Note: \(B\) is only non-zero in the presence of backflow.\\
+        \(\implies B\) is exceptionally sparse when discretised.\\
+        \(\implies\) Only a few small non-zero blocks\\
+        \(\therefore\) We could then rather extract the block matrices of \(-B+S\) where the discretisation of \(B\) is non-zero.
+        %Note that B is only non-zero in the presence of backflow so in its discretised form it is exceptionally %sparse, indeed most of the matrix is zeros besides a few small blocks.  %rewite more compact
+    \end{frame}

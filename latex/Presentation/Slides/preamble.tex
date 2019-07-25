@@ -1,0 +1,176 @@
+%% Useful packages
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsfonts}
+\usepackage{bm}
+
+%% Sets page size and margins
+% \usepackage[a4paper,top=1in,bottom=1in,left=1.5in,right=1in]{geometry}
+\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm,bindingoffset=6mm]{geometry}
+\usepackage[titletoc]{appendix}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\setlength{\headheight}{14.5pt}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\fancyhf{}
+% \fancyhead[RO,LE]{Chapter~\thechapter: \leftmark}
+\fancyhead[RO,LE]{Chapter \thechapter}
+% \fancyhead{}
+% \fancyhead[RO,LE]{Automation of Backflow Stabilisation Parameters}
+% \fancyhead[RO,LE]{Chapter \thechapter: }
+% \fancyhead[RE,LO]{\rightmark}
+\fancyfoot{}
+\fancyfoot[CE,CO]{\thepage}
+% \fancyfoot[CE,CO]{Chapter \thechapter}
+% \fancyfoot[CO,RE]{Author Name}
+
+%% Math
+\usepackage{amsmath} %
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{mathpazo}
+\usepackage{physics}
+
+%% Graphics
+\usepackage{graphicx}
+\graphicspath{ {media/} }
+\usepackage{xcolor}
+
+%% Figures
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{caption}
+
+
+%% Format
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{enumerate}
+\usepackage{csquotes}
+\usepackage[backend=biber,style=ieee,url=true,doi=true,dashed=false,sorting=nyt]{biblatex}
+\addbibresource{citations.bib}
+\usepackage{comment}
+
+%% For Title Page
+\usepackage{pdfpages}
+
+
+% %%%%%%--FOR ABS AND NORM--%%%%%%
+% \DeclarePairedDelimiter\abs{\lvert}{\rvert}
+% \DeclarePairedDelimiter\norm{\lVert}{\rVert}
+
+% \makeatletter
+% \let\oldabs\abs
+% \def\abs{\@ifstar{\oldabs}{\oldabs*}}
+% %
+% \let\oldnorm\norm
+% \def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+% \makeatother
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%--MINI MATH MODE--%%%%%%
+\newcommand{\mathm}[1]{\(#1\)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%--This is for simpler integrals--%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{xparse}
+
+% \newcommand\dd{\mathrm{d}}
+
+% \ExplSyntaxOn
+% \NewDocumentCommand \Int { s o m o }
+%   {%
+%     \IfNoValueTF{ #2 }
+%       { \int }
+%       {
+%         \fiziks_int:nn { #1 } { #2 }
+%       }
+%     #3
+%     \IfNoValueF { #4 } { \fiziks_int_dx:n { #4 } }
+%   }
+
+% \seq_new:N \l__fiziks_int_args_seq
+% \tl_new:N \l__fiziks_int_ast_tl
+
+% \cs_new_protected:Npn \fiziks_int:nn #1 #2
+%   {
+%     \seq_set_split:Nnn \l__fiziks_int_args_seq { ; } { #2 }
+%     \seq_map_inline:Nn \l__fiziks_int_args_seq 
+%       {
+%         \tl_if_in:nnTF { ##1 } { * }
+%           {% * case
+%             \tl_set:Nn \l__fiziks_int_ast_tl { ##1 }
+%             \tl_remove_once:Nn \l__fiziks_int_ast_tl { * }
+%             \fiziks_int_inner:NnV \oint { #1 } \l__fiziks_int_ast_tl
+%           }
+%           {% no * case
+%             \fiziks_int_inner:Nnn \int { #1 } { ##1 }
+%           }
+%       }
+%   }
+% \cs_new_protected:Npn \fiziks_int_inner:Nnn #1 #2 #3
+%   {
+%     #1
+%     \tl_if_blank:nF { #3 } 
+%       {
+%         \IfBooleanT { #2 } { \limits }
+%         \fiziks_int_inner_inner:Nx \sb { \clist_item:nn { #3 } { 1 } }
+%         \fiziks_int_inner_inner:Nx \sp { \clist_item:nn { #3 } { 2 } }
+%       }
+%   }
+% \cs_generate_variant:Nn \fiziks_int_inner:Nnn { NnV }
+% \cs_new:Npn \fiziks_int_inner_inner:Nn #1 #2
+%   {
+%     \tl_if_blank:nF { #2 } { #1 { #2 } }
+%   }
+% \cs_generate_variant:Nn \fiziks_int_inner_inner:Nn { Nx }
+
+% \cs_new_protected:Npn \fiziks_int_dx:n #1
+%   {
+%     \seq_set_split:Nnn \l__fiziks_int_args_seq { ; } { #1 }
+%     \seq_map_inline:Nn \l__fiziks_int_args_seq
+%       {
+%         \,\dd##1
+%       }
+%   }
+% \ExplSyntaxOff
+% %%      Can be used as \Int[0,T;0,a]{f^2}[t;x]    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{csvsimple}
+\usepackage{multicol}
+\usepackage{multirow} 
+\usepackage{fancybox, calc}
+\usepackage{listings}
+\usepackage{siunitx}
+
+
+
+
+
+
+
+
+\newcommand{\mychapter}[2]{
+    \setcounter{chapter}{#1}
+    \setcounter{section}{0}
+    \chapter*{#2}
+    \addcontentsline{toc}{chapter}{#2}}
+
+\usepackage{lipsum}
+
+\newcommand{\bmu}{{\textbf{u}}}
+\newcommand{\bmv}{{\textbf{v}}}
+\newcommand{\bmn}{{\textbf{n}}}
+
+\newcommand{\bint}{\int\limits_{\Gamma_{N}}}
+\newcommand{\fint}{\int\limits_{\Omega}}
+
+\usepackage{afterpage}
+
+\DeclareRobustCommand{\orderof}{\ensuremath{\mathcal{O}}}
