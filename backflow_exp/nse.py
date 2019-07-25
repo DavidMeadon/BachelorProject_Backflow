@@ -1,46 +1,15 @@
 from dolfin import *
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy as sp
+import scipy.sparse.linalg as ssl
+from numpy import linalg as LA
+import progress as prog
+import HelperFuncs as HF
 
 
-def abs_n(x):
-    return -0.5 * (x - abs(x))
+def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002, dt=0.001, plotcircles=0, gammagiv=1, betagiv=1):
 
-
-# TODO rework the backflowarea function since it doesn't do as it should.
-def backflowarea(a, b, c):
-    if assemble(abs_n(dot(a, b)) * c) > 0:
-        return 1
-    else:
-        return 0
-
-
-def test(a, b):
-    print(dot(a, b))
-    return 1
-
-
-def betaupdate(current_sol, prev_sol, facet_norm, dx, beta):
-    if assemble(abs_n(dot(current_sol, facet_norm)) * div(current_sol) * dx) > assemble(abs_n(dot(prev_sol, facet_norm)) * div(prev_sol) * dx):
-        return min(max(assemble(beta * dx) + 0.1, 0.2), 1)
-    else:
-        return min(max(assemble(beta * dx) - 0.1, 0.2), 1)
-
-
-class MyParameter:
-    param = 1
-
-    def __init__(self, value):
-        self.param = value
-
-    def update(self, value):
-        self.param = value
-
-    def value(self):
-        return self.param
-
-
-def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002, dt=0.001):
     mesh_root = 'stenosis_f0.6'
     if level == 2:
         mesh_root += '_fine'
@@ -48,6 +17,7 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     mesh = Mesh(mesh_root + '.xml')
     boundaries = MeshFunction('size_t', mesh, mesh_root + '_facet_region.xml')
     ds = Measure('ds', domain=mesh, subdomain_data=boundaries)
+    stabmethod = 'No stabilization'
 
     VE = VectorElement('P', mesh.ufl_cell(), velocity_degree)
     PE = FiniteElement('P', mesh.ufl_cell(), 1)
@@ -58,13 +28,20 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     w = Function(W)
     u0, p0 = w.split()
 
+
+    ####
+
     theta = Constant(1)
     k = Constant(1 / dt)
     mu = Constant(0.035)
     rho = Constant(1.2)
     eps = Constant(eps)
 
-    U = 3 / 2 * 0.5 * Re * float(mu) / float(rho)
+
+
+
+
+    U = (3 / 2) * 0.5 * Re * float(mu) / float(rho)
 
     print('\n Re = {}, U = {}\n'.format(Re, U))
 
@@ -72,9 +49,11 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     theta_p = theta
     p_ = theta_p * p + (1 - theta_p) * p0
 
+    laplace = mu * inner(grad(u_), grad(v)) * dx #Defined separately so it may be used later
+
     F = (
             k * rho * dot(u - u0, v) * dx
-            + mu * inner(grad(u_), grad(v)) * dx
+            + laplace
             - p_ * div(v) * dx + q * div(u) * dx
             + rho * dot(grad(u_) * u0, v) * dx
     )
@@ -87,19 +66,46 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
     if temam:
         F += 0.5 * rho * div(u0) * dot(u_, v) * dx
 
-    beta = Constant(1)  # TODO add an initial beta value, probably 1
+    beta = Constant(betagiv)    #Defines the initial beta from the given value
+    gamma = Constant(gammagiv) #Defines the initial gamma from the given value
 
+    backflow_func = 0.5 * rho * HF.abs_n(dot(u0, n)) * dot(u_, v) * ds(2) 
+
+    param = 'No param'
+
+    G = 0 #This variable will contain the backflow stabilisation term
     ### Added here beta parameter to the stabilization terms which we can control
     if bfs == 1:
-        F -= 0.5 * rho * beta * dot(u0, n) * dot(u_, v) * ds(2)
+        param = 'beta' #Setting the string for the parameter being changed
+        stabmethod = 'velocity-penalization'  #Setting the string for the stabilisation method being changed
+        G = 0.5 * rho * beta * dot(u0, n) * dot(u_, v) * ds(2)
+        F -= G
     elif bfs == 2:
-        F -= 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
+        param = 'beta'
+        stabmethod = 'velocity-penalization negative part'
+        G = 0.5 * rho * beta * HF.abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
+        F -= G
     elif bfs == 3:
+        param = 'gamma'
+        stabmethod = 'tangential penalization'
         Ctgt = h ** 2
-        F -= Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
+        G = gamma * Ctgt * 0.5 * rho * HF.abs_n(dot(u0, n)) * (
                 Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
+    elif bfs == 4:
+        param = 'gamma'
+        stabmethod = 'tangential penalization - 2016 paper'
+        Ctgt = h ** 2
+
+        maxiv = HF.maxUneg(W, mesh, u0) #Finding the max|u dot n|_ 
+        maxi = Constant(maxiv)
+
+        G = -1 * gamma * maxi * 0.5 * rho * Ctgt * (Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
+        F -= G
     elif velocity_degree == 1 and float(eps):
         F += eps / mu * h ** 2 * inner(grad(p_), grad(q)) * dx
+
+    stabilisationTest = backflow_func - G #This term will be the one worked with during the automation, it could have added terms
+                                          #Such as the laplace or other stabilising terms.
 
     a = lhs(F)
     L = rhs(F)
@@ -116,169 +122,137 @@ def nse(Re=1000, temam=False, bfs=False, level=1, velocity_degree=2, eps=0.0002,
 
     A = assemble(a)
 
-    suf = 'bfs{}_tem{}_Re{}'.format(int(bfs), int(temam), Re)
+    #Below is needed for good plots
+    if auto:
+        runtype = "auto"
+    elif param == 'beta':
+        runtype = round(assemble(beta * ds(2)), 3)
+    elif param == 'gamma':
+        runtype = round(assemble(gamma * ds(2)))
+    elif param == 'No param':
+        runtype = "No param"
+
+    #The below is for formatting that names of the output files to be used in paraview
+    suf = 'bfs{}_tem{}_Re{}_'.format(int(bfs), int(temam), Re) + param + '_' + '{}_'.format(runtype)
     if velocity_degree == 1:
         suf = 'p1_' + suf
     suf = 'l{}_'.format(level) + suf
 
-    # xdmf_u = XDMFFile('results/u_' + suf + '.xdmf')
-    # xdmf_p = XDMFFile('results/p_' + suf + '.xdmf')
-    # xdmf_tau = XDMFFile('tau_sd_' + suf + '.xdmf')
+    xdmf_u = XDMFFile('results/u_' + suf + '.xdmf')
+    xdmf_p = XDMFFile('results/p_' + suf + '.xdmf')
+    xdmf_tau = XDMFFile('tau_sd_' + suf + '.xdmf')
     # xdmf_u.parameters['rewrite_function_mesh'] = False
     # xdmf_p.parameters['rewrite_function_mesh'] = False
     # xdmf_tau.parameters['rewrite_function_mesh'] = False
-    #
-    # u0.rename('u', 'u')
-    # p0.rename('p', 'p')
 
-    w0 = Function(W)
-    r0, s0 = w0.split()
-
-    w1 = Function(W)
-    r1, s1 = w1.split()
+    u0.rename('u', 'u')
+    p0.rename('p', 'p')
 
     # FINAL TIME
     T = 0.4
-    ite = 0
-    # PLOTTING VECTORS
-    viscEnergyVec = np.zeros(((int)(T / dt), 1))
-    ToteviscEnergyVec = np.zeros(((int)(T / dt), 1))
-    incEnergyVec = np.zeros(((int)(T / dt), 1))
-    incEnergyVec2 = np.zeros(((int)(T / dt), 1))
-    numEnergyVec = np.zeros(((int)(T / dt), 1))
-    stabEnergyVec = np.zeros(((int)(T / dt), 1))
-    #     print(type(F))
+
+    pt = prog.progress_timer(description='Time Iterations', n_iter=40) #Used to have a progress bar
     # MAIN SOLVING LOOP
+    eigvec = []#Used when finding eigenvalues with varying values of the parameters, i.e. when needing to run multiple times
+
     for t in np.arange(dt, T + dt, dt):
-        print('t = {}'.format(t))
-
-        #### May not be necessary ####
-        w0.assign(w)
-        r0, s0 = w0.split()
-        ####
-
+        
+        ## Using Fenics to find the current solution
         inflow.t = t
         assemble(a, tensor=A)
         b = assemble(L)
         [bc.apply(A, b) for bc in bcs]
         solve(A, w.vector(), b)
 
-        #### May not be necessary ####
+        ## Creating all the plots
+        if plotcircles > 0:
+            if bfs == 4: # Update the max|u dot n|_
+                maxiv = HF.maxUneg(W, mesh, u0)
+                maxi.assign(maxiv)
 
-        ###
+            ## Creating matrix with just backflow term
+            backflow_mat = assemble(lhs(backflow_func))
+            backflow_vec = np.array(backflow_mat.array())
 
-        w1.assign(w)
-        r1, s1 = w1.split()
+            ## Create backflow with stabilisation matrix
+            stabTensor = assemble(lhs(stabilisationTest))
+            # for bc in bcs: bc.apply(stabTensor) %% If including the Laplace term then need to apply BC's
+            stabMatrix = np.array(stabTensor.array())
 
-        r1.vector().set_local(u0.vector().get_local() * (u0.vector().get_local() < 0))
+            ## Creating reduced Stabilisation Matrix
+            if backflow_vec.any():
+                maxidx2 = np.array([np.nonzero(backflow_vec)[0].max(), np.nonzero(backflow_vec)[1].max()]).max()
+                minidx2 = np.array([np.nonzero(backflow_vec)[0].min(), np.nonzero(backflow_vec)[1].min()]).min()
+                reduced_stabMatrix = stabMatrix[minidx2:maxidx2 + 1, minidx2:maxidx2 + 1]
+            else:
+                reduced_stabMatrix = np.resize(np.array([]), [1, 1])
 
-        # ite +=1
-        # if ite==5:
-        #    plt.plot(r1.vector().get_local())
-        #    plt.plot(u0.vector().get_local())
+            ## Finding eigenvalues of reduced matrix and making the Gershgorin circles
+            eigenvals_reduced_stabMatrix = LA.eigvals(reduced_stabMatrix)
+            circles = HF.GregsCircles(reduced_stabMatrix)
+            fig = HF.plotCircles(circles, round(t, 2), stabmethod, param, runtype)
 
-        # print('|u|:', norm(u0))
-        # print('|p|:', norm(p0))
-        # print('div(u):', assemble(div(u0)*dx))
+            ## If want the minimum eigenvalues of the entire matrix and plot them
+            if plotcircles == 2 and eigenvals_reduced_stabMatrix.size > 0 and stabMatrix.any():
+                stabMatrix_sparse = sp.sparse.bsr_matrix(stabMatrix)  # Sparse Version
+                small_eigenvals_stabMatrix = ssl.eigs(stabMatrix_sparse, 5, sigma=-10, which='LM', return_eigenvectors=False, v0=np.ones(stabMatrix_sparse.shape[0]))
+                printlab = True
+                for EV in small_eigenvals_stabMatrix:
+                    if printlab:
+                        plt.plot(EV.real, EV.imag, 'ko', label='Eigenvalues of full Matrix')
+                        printlab = False
+                    else:
+                        plt.plot(EV.real, EV.imag, 'ko', label='_nolegend_')
+                del stabMatrix_sparse, small_eigenvals_stabMatrix
+            
+            ## Plotting the eigenvalues of the reduced matrix
+            printlab = True
+            for eigval in eigenvals_reduced_stabMatrix:
+                if printlab:
+                    plt.plot(eigval.real, eigval.imag, 'r+', label='Eigenvalues of reduced Matrix')
+                    printlab = False
+                else:
+                    plt.plot(eigval.real, eigval.imag, 'r+', label='_nolegend_')
+            if eigenvals_reduced_stabMatrix.size > 0:
+                plt.legend()
+            fig.savefig('circles/' + str(round(t * 100)) + 'gersh.png')
+            del stabTensor, stabMatrix, reduced_stabMatrix, eigenvals_reduced_stabMatrix, backflow_mat, backflow_vec
+            plt.close(fig)
 
-        ### This was trying to view U0 as a numpy array but didnt show anything meaningful ####
-        # for i in u0.vector().get_local():
-        #     print(i)
-        # print(u0.vector().get_local())
 
-        # BACKFLOW KINETIC ENERGY CHANGE
-        BKE = assemble((rho / 2) * abs_n(dot(r0, n)) * dot(u0, u0) * ds(2))
+        xdmf_u.write(u0, t)
+        xdmf_p.write(p0, t)
+        pt.update()
+    pt.finish()
+    return eigvec
 
-        # BACKFLOW VISCOUS ENERGY CHANGE
-        # BVE = assemble(mu * inner(grad(r1),grad(r1)) * ds(2))
-        # TVE = assemble(mu * inner(grad(u0),grad(u0))  * ds(2))
-        TVE = assemble(mu * inner(grad(u0), grad(u0)) * dx)
-
-        #         print( (abs_n(u0) != 0) )
-        # BVEs = assemble(mu * np.abs(div(u0)) * div(r1) * ds(2))
-
-        # TODO rework the backflowarea function so that it is one when there is backflow and 0 otherwise
-
-        # ADDING TO VECTORS
-        # viscEnergyVec[(int)(t / dt) - 1] = BVE
-        ToteviscEnergyVec[(int)(t / dt) - 1] = TVE
-
-        incEnergyVec[(int)(t / dt) - 1] = BKE
-
-        numEnergyVec[(int)(t / dt) - 1] = assemble((dot(u0 - r0, u0 - r0)) * ds(2))
-
-        ### Here want to calculate how much energy chnages due to the stabilization
-        if bfs == 1:
-            stabEnergyVec[(int)(t / dt) - 1] = assemble(0.5 * beta * rho * abs_n(dot(u0, n)) * dot(u0, u0) * ds(2))
-        elif bfs == 2:
-            stabEnergyVec[(int)(t / dt) - 1] = assemble(0.5 * beta * rho * abs_n(dot(u0, n)) * dot(u0, u0) * ds(2))
-        elif bfs == 3:
-            Ctgt = h ** 2
-            stabEnergyVec[(int)(t / dt) - 1] = assemble(Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
-                    Dx(u0[0], 1) * Dx(u0[0], 1) + Dx(u0[1], 1) * Dx(u0[1], 1)) * ds(2))
-
-        ### Print out the values for the energy changes at the current time step
-        # print('Viscous energy change:', viscEnergyVec[(int)(t/dt) - 1])
-        # print('Incoming energy change:', incEnergyVec[(int)(t/dt) - 1])
-        # print('Numerical energy:', numEnergyVec[(int)(t/dt) - 1])
-
-        # xdmf_u.write(u0, t)
-        # xdmf_p.write(p0, t)
-        # xdmf_p.write(p0, t)
-
-        # print(F)
-        #         if bfs == 1:
-        #           F += 0.5 * rho * beta * dot(u0, n) * dot(u_, v) * ds(2)
-        #         elif bfs == 2:
-        #           F += 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
-        #         elif bfs == 3:
-        #             Ctgt = h ** 2
-        #             F += Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
-        #                 Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
-        # beta.assign(betaupdate(u0, r1, n, ds(2), beta))
-        # print(assemble(beta*ds(2)))
-        #         beta = betaupdate(u0, r1, n, ds(2), beta) #This isn't updating the one in the function
-        # #         print(assemble(beta*ds(2)))
-
-        #         if bfs == 1:
-        #           F -= 0.5 * rho * beta * dot(u0, n) * dot(u_, v) * ds(2)
-        #         elif bfs == 2:
-        #           F -= 0.5 * rho * beta * abs_n(dot(u0, n)) * dot(u_, v) * ds(2)
-        #         elif bfs == 3:
-        #             Ctgt = h ** 2
-        #             F -= Ctgt * 0.5 * rho * abs_n(dot(u0, n)) * (
-        #                 Dx(u[0], 1) * Dx(v[0], 1) + Dx(u[1], 1) * Dx(v[1], 1)) * ds(2)
-
-        #         a = lhs(F)
-        #         L = rhs(F)
-
-        #         A = assemble(a)
-
-        # print(F)
-        # beta = beta/2;    # TODO change the beta parameter to update every iteration of the loop
-        # Is it possible to solve along a specific boundary?
-        # Can we get the matrices use behind the scenes in fenics?
-        # print(F)
-    plt.figure()
-    # plt.plot(viscEnergyVec, 'b', label="Viscous")
-    # plt.plot(ToteviscEnergyVec, 'forestgreen', label="tot Viscous")
-    plt.plot(incEnergyVec, 'red', label="Incoming")
-    # plt.plot(numEnergyVec, 'yellow', label="Numerical")
-    # plt.plot(stabEnergyVec, 'orange', label='Stabilization')
-    plt.plot(ToteviscEnergyVec + numEnergyVec, 'deepskyblue', label='Total corrective energy')
-    plt.legend(loc='upper left')
-    plt.show()
-
-    # del xdmf_u, xdmf_p
+    del xdmf_u, xdmf_p
 
 
 if __name__ == '__main__':
-    Re = [2000]
+    Re = [5000]
+    betaVec = [1] #Here an array of different beta values can be specified
+    # gammaVec = [1] %If want to use a method relying on gamma
+    eigsarr = []
 
     for Re_ in Re:
-        nse(Re_, level=1, temam=True, bfs=2, velocity_degree=1, eps=0.0001, dt=0.01)
+        for beta in betaVec:
+            eigsarr.append(nse(Re_, level=1, temam=True, bfs=0, velocity_degree=1, eps=0.0001, dt=0.01,
+                                     plotcircles=2, betagiv=beta))
 
-        ## Weird results for the stabilization if bfs = 2,3. Stabilization Energy is too high
+
+    ### Below can be used to create the plots showing affect of beta on eigenvalues
+    # figP = plt.figure()
+    # plt.plot(betaVec, mineigsP, '^--', c='coral')
+    # plt.plot(betaVec, maxeigsP, '+--', c='lime')
+    # plt.plot(betaVec, np.abs(mineigsP - maxeigsP), 'o--', c='aqua')
+    # plt.legend(["Minimum Eigenvalue", "Maximum Eigenvalue", "abs(Max - Min) Eigenvalue"])
+    # # plt.title("Eigenvalue change for gamma = 1,2,3 with stab-method = Tang(2016)")
+    # plt.title("Eigenvalue change for beta = 0.1 - 1.0 with stab-method = Velo")
+    # plt.xlabel("beta")
+    # # plt.ylabel("")
+    # plt.show()
+    # figP.savefig('compare/' + 'Beta_1_thru_0_velo' + '.png')
 
     # level:
     #   1:  coarse grid h = 0.05
@@ -288,4 +262,5 @@ if __name__ == '__main__':
     #   1:  (u.n)(u.v)
     #   2:  |u.n|_(u.v)  inertial
     #   3:  tangential
+    #   4:  2016 tangential
 
