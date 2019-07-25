@@ -1,0 +1,55 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% I, the copyright holder of this work, release this work into the
+%% public domain. This applies worldwide. In some countries this may
+%% not be legally possible; if so: I grant anyone the right to use
+%% this work for any purpose, without any conditions, unless such
+%% conditions are required by law.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{beamer}
+\usetheme[faculty=science, university=uu, logo=uu-logo]{fibeamer}
+\usepackage[utf8]{inputenc}
+\usepackage[
+  main=english %% By using `czech` or `slovak` as the main locale
+                %% instead of `english`, you can typeset the
+                %% presentation in either Czech or Slovak,
+                %% respectively.
+                %% The additional keys allow foreign texts to be
+]{babel}        %% typeset as follows:
+%%
+%%   \begin{otherlanguage}{czech}   ... \end{otherlanguage}
+%%   \begin{otherlanguage}{slovak}  ... \end{otherlanguage}
+%%
+%% These macros specify information about the presentation
+\title{Automation of Backflow Stabilisation Parameters} %% that will be typeset on the
+%\subtitle{Presentation Subtitle} %% title page.
+\author{David Meadon\\
+\vspace{10pt}
+\footnotesize{Supervisor: Dr. C.A. Bertoglio\\
+Second Assessor: Dr.Ir. B. Besselink}
+}
+%% These additional packages are used within the document:
+\usepackage{ragged2e}  % `\justifying` text
+\usepackage{booktabs}  % Tables
+\usepackage{tabularx}
+\usepackage{tikz}      % Diagrams
+\usetikzlibrary{calc, shapes, backgrounds}
+\usepackage{amsmath, amssymb}
+\usepackage{url}       % `\url`s
+\usepackage{listings}  % Code listings
+\usepackage{graphicx,wrapfig,lipsum}  % arrange images next to text
+\frenchspacing
+\input{presipreamble.tex}
+\begin{document}
+
+\input{Slides/Intro.tex}
+
+\input{Slides/mainpart.tex}
+
+\input{Slides/results.tex}
+
+\input{Slides/conc.tex}
+%  \input{Slides/slides.tex}
+ 
+%  \input{Slides/slides2.tex}
+\end{document}
